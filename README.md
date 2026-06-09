@@ -8,6 +8,14 @@
 
 This repository contains a LingTai-style Skill package for **Book-to-Skill Sparse Distillation**: turning long-form knowledge into a callable, budget-aware, cross-linked, verifiable agent capability.
 
+
+## Structure diagram
+
+A visual structure diagram is available here:
+
+- [`docs/structure-diagram.md`](docs/structure-diagram.md) — Mermaid architecture diagram
+- [`assets/structure-diagram.mmd`](assets/structure-diagram.mmd) — raw Mermaid source
+
 ## What is inside
 
 ```text

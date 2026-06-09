@@ -1,0 +1,16 @@
+flowchart TD
+    A[Book / Textbook / Long Methodology] --> B[Distillation Pass]
+    B --> C[Shared Core]
+    B --> D[Skill Experts]
+    B --> E[References & Assets]
+    U[User / Agent Task] --> G[Lightweight Gate: ROUTING.yaml]
+    G -->|top-k hit| D
+    G -->|if needed| R[Missed-case Sweep]
+    C --> O[Task Output]
+    D --> O
+    E --> O
+    R --> O
+    O --> V[Validation / Evals]
+    V --> L[Route Log / Gotchas]
+    L --> K[Cache & Graph Update]
+    K --> G
