@@ -74,3 +74,8 @@ Book
 > 先炼核心，再分专家；先中主脉，再扫旁枝；预算分层，重料后置；路由留痕，越用越准。
 
 > 网给 Skill 以通达，环给 Skill 以低功耗；分支出去，回流成丹。
+
+
+## Proposal-based self-evolution
+
+The feedback loop is intentionally not a hidden auto-mutation loop. Route logs, gotchas, and missed cases should become **reviewable patches** to `ROUTING.yaml`, `GRAPH.md`, `CACHE.md`, and eval cases. See [`self-evolution-loop.md`](self-evolution-loop.md).
