@@ -15,7 +15,7 @@ A visual structure diagram is available here:
 
 - [`docs/structure-diagram.md`](docs/structure-diagram.md) — Mermaid architecture diagram
 - [`assets/structure-diagram.mmd`](assets/structure-diagram.mmd) — raw Mermaid source
-- [`docs/self-evolution-loop.md`](docs/self-evolution-loop.md) — proposal-based Skill self-evolution loop
+- [`docs/self-evolution-loop.md`](docs/self-evolution-loop.md) — proposal-based Skill-system evolution loop (not automatic mutation of a static folder)
 
 ## What is inside
 

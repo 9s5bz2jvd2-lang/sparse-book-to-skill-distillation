@@ -15,6 +15,29 @@ Skill call
   -> next call has a better route/cache hit
 ```
 
+
+## What a plain static Skill cannot do
+
+A plain Skill folder cannot self-evolve by itself. For example, this alone is static:
+
+```text
+SKILL.md + references/ + scripts/ + assets/
+```
+
+It cannot observe its own routing decisions, remember failures, judge output quality, or edit itself. At most, it is a callable external memory / workflow package.
+
+Self-evolution only becomes possible at the **Skill system** level, when the Skill is connected to:
+
+- an agent or runtime that records route decisions;
+- evals that judge whether the output was good enough;
+- gotcha / missed-case logs that preserve failures;
+- a repository or patch mechanism that can propose changes;
+- a human or maintainer review gate.
+
+So the precise claim is not “a Skill file can evolve by itself.” The claim is:
+
+> A Skill ecosystem can evolve when invocation experience is distilled into reviewable patches to routing, graph, cache, and eval files.
+
 ## Why not fully automatic mutation?
 
 A Skill package contains executable judgment: triggers, safety boundaries, evidence rules, scripts, templates, and references. If it mutates itself without review, it can:
