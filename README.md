@@ -4,7 +4,9 @@
 
 核心思想：
 
-> 先炼核心，再分专家；先中主脉，再扫旁枝；预算分层，重料后置；路由留痕，越用越准。
+> 蒸馏全量不丢，渐进披露分层；调用稀疏激活，重料按需加载；路由留痕，越用越准。
+
+**两阶段分离**：蒸馏阶段全量提取所有知识，按 L0–L3 渐进式披露分层存储，不采样不跳过；调用阶段稀疏激活，只加载当前任务需要的层和专家。
 
 This repository contains a LingTai-style Skill package for **Book-to-Skill Sparse Distillation**: turning long-form knowledge into a callable, budget-aware, cross-linked, verifiable agent capability.
 
@@ -22,7 +24,7 @@ A visual structure diagram is available here:
 ```text
 .
 ├── SKILL.md              # Main executable entry for agents
-├── ROUTING.yaml          # Trigger / anti-trigger / budget / missed-case sweep hints
+├── ROUTING.yaml          # Trigger / anti-trigger / budget / progressive disclosure / missed-case sweep
 ├── GRAPH.md              # Skill graph, neighboring skills, micro-LLM analogy
 ├── CACHE.md              # Cache-friendly layout and low-power gotchas
 └── assets/
@@ -45,3 +47,11 @@ See [`RULES.md`](RULES.md) for contribution, attribution, and reuse boundaries.
 ## License / reuse
 
 No open-source license is granted yet. The repository is public for reading and discussion, but copying, commercial use, redistribution, or publishing derivative systems requires explicit permission from the owner unless a license is added later.
+
+---
+
+> **禁止抄袭商用，违者等同盗法，因果自负**
+> **Plagiarism and commercial use are strictly prohibited. Violators shall be deemed as thieves of sacred scriptures and shall face divine karmic retribution themselves.**
+>
+> 公益开源项目，禁止商用 | Public welfare open-source project, commercial use prohibited
+> License: CC BY-NC 4.0

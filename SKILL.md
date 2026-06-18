@@ -8,7 +8,7 @@ tags: [skill-authoring, distillation, textbook, sparse-routing, progressive-disc
 
 # 稀疏蒸馏 | Book-to-Skill Sparse Distillation
 
-> **蒸馏不是把一本书压缩成摘要；蒸馏是把一套知识炼成后来者能稀疏调用、查漏验证、持续回流的 Skill Graph。**
+> **蒸馏不是把一本书压缩成摘要；蒸馏是把一套知识全量炼成后来者能稀疏调用、查漏验证、持续回流的 Skill Graph。蒸馏阶段不采样、不跳过；稀疏只在调用层发生。**
 
 此 skill 融合四条脉络：
 
@@ -86,7 +86,8 @@ tags: [skill-authoring, distillation, textbook, sparse-routing, progressive-disc
 ├── GRAPH.md             # 上游/下游/相邻/互斥/安全门关系
 ├── CACHE.md             # stable prefix / variable suffix / on-demand reference 布局
 ├── reference/
-│   ├── source-map.md    # 源材料地图；不复制原文
+│   ├── source-map.md    # 源材料地图 + 渐进式披露分层索引
+│   ├── <expert>.md      # 每个专家的 L3 full 全量细节
 │   ├── theory.md        # 长理论和解释
 │   └── examples.md      # 少量去私有化示例
 ├── assets/
@@ -103,12 +104,15 @@ tags: [skill-authoring, distillation, textbook, sparse-routing, progressive-disc
 
 ### 1. Source layer：源材料层
 
-回答：**这本书/资料到底有什么结构？**
+回答：**这本书/资料到底有什么结构？全部提取出来，不丢不采样。**
 
-- 建目录树、主题树、概念表；
-- 标注哪些是核心理论、例子、流程、公式、证据、警告；
+- 逐章逐节提取所有知识点、判断逻辑、流程、公式、证据、警告；
+- 按渐进式披露分层组织（L0 signature → L1 brief → L2 standard → L3 full）；
+- 每一层是同一知识的不同粒度表达，不是不同知识的切片；
 - 标注来源位置，但不要大段复制原文；
-- 区分“可公开复述的概念”和“不能公开再分发的原文/私有数据”。
+- 区分"可公开复述的概念"和"不能公开再分发的原文/私有数据"。
+
+> **关键区别**：蒸馏阶段全量提取，不丢任何知识；渐进式披露是组织方式，不是采样方式。稀疏激活在 Runtime layer 才发生。
 
 ### 2. Skill layer：可执行技能层
 
@@ -148,19 +152,30 @@ tags: [skill-authoring, distillation, textbook, sparse-routing, progressive-disc
 
 若版权或隐私不稳：只做**结构化学习笔记/私有 knowledge**，不要做可分发 skill。
 
-### Step 2：建 source map，不写流水账摘要
+### Step 2：全量提取，渐进式披露分层
 
-把源材料拆成可路由单元：
+蒸馏阶段不采样、不跳过。逐章逐节提取所有知识点、判断逻辑、流程、公式、证据、警告，但按渐进式披露分层组织：
+
+| 层级 | 内容 | Token 预算 | 用途 |
+|---|---|---|---|
+| L0 signature | 触发词、反触发、一句话用途 | 50–100 | 路由匹配，不加载正文 |
+| L1 brief | 核心知识、关键判断、安全红线 | 200–500 | 快速回答，不需展开 |
+| L2 standard | 完整流程、示例、边界情况 | 800–3000 | 标准任务执行 |
+| L3 full | 全量细节、所有案例、所有证据 | 不限 | 深度引用，验收失败时加载 |
+
+每一层都是对同一知识的不同粒度表达：L0 是 L1 的索引，L1 是 L2 的精炼，L2 是 L3 的结构化提取。**所有层在蒸馏阶段全部生成，不丢任何知识。**
+
+同时建 source map 记录来源位置与版权边界：
 
 ```markdown
-| 单元 | 来源位置 | 主题 | 作用 | 风险 | 可否进公开 skill |
+| 单元 | 来源位置 | 主题 | 渐进层 | 风险 | 可否进公开 skill |
 |---|---|---|---|---|---|
-| Ch1 | 第1章 | 基础概念 | shared core | 低 | 可抽象复述 |
-| Ch4 | 第4章 | 具体案例 | reference/example | 中 | 去私有化后可用 |
-| Appx | 附录 | 表格/公式 | script/schema | 低 | 可改写为工具 |
+| Ch1 | 第1章 | 基础概念 | L0→L1→L2→L3 | 低 | 可抽象复述 |
+| Ch4 | 第4章 | 具体案例 | L0→L1→L2→L3 | 中 | 去私有化后可用 |
+| Appx | 附录 | 表格/公式 | L0→L1→L2→L3 | 低 | 可改写为工具 |
 ```
 
-关键：source map 是导航，不是复制原文。
+关键：**蒸馏全量不丢，稀疏在调用层做。** source map 既记录来源，也记录每个单元已蒸馏到哪一层。
 
 ### Step 3：抽 shared core
 
@@ -188,15 +203,27 @@ behavior-change-expert     # 行为干预沟通
 report-writing-expert      # 报告生成
 ```
 
-每个 expert 都要有：
+每个 expert 都要有渐进式披露四层定义：
 
 ```yaml
+# L0: signature（路由匹配用，不加载正文）
 trigger_terms:
 anti_triggers:
+one_liner: "这个专家做什么"
+
+# L1: brief（快速回答用）
+core_knowledge:
+key_judgments:
+safety_red_lines:
+
+# L2: standard（标准任务执行用）
 budget_default:
 minimum_workflow:
 load_more_if:
 missed_case_items:
+
+# L3: full（深度引用，验收失败时加载）
+# 存放在 reference/<expert-name>.md，全量细节
 ```
 
 ### Step 5：设计 sparse-first activation
@@ -244,18 +271,20 @@ main route done → neighbor/safety sweep → decide whether to load more → fi
 - 引用真实可核验；
 - 个体化建议的边界。
 
-### Step 7：分配预算层级
+### Step 7：分配调用预算层级
 
-不是所有内容都配同样 token。
+蒸馏阶段全量产出 L0–L3 所有层，不设预算限制。以下预算仅约束**调用阶段**——即运行时加载哪一层：
 
-| 层级 | 用途 | 预算策略 |
+| 层级 | 用途 | 调用预算 |
 |---|---|---|
-| shared-core | 常驻原则/红线/路由边界 | 极小、稳定、可缓存 |
-| routed-high | 主任务专家 | 中高预算 |
-| routed-low | 相邻辅助专家 | 摘要/清单级预算 |
+| shared-core (≈L1) | 常驻原则/红线/路由边界 | 极小、稳定、可缓存 |
+| routed-high (L2) | 主任务专家 | 中高预算 |
+| routed-low (L1) | 相邻辅助专家 | 摘要/清单级预算 |
 | missed-case-sweep | 查漏、红旗、反触发 | 小预算 checklist |
-| heavy-reference | 原理、案例、长表、模板 | 明确需要才读 |
+| heavy-reference (L3) | 全量细节、案例、证据 | 仅验收失败时加载 |
 | script/tool | 确定性抽取/统计/校验 | 不烧 LLM token |
+
+> 蒸馏不省钱，调用才省钱。蒸馏的质量不打折扣，省 token 的事情交给路由层做。
 
 ### Step 8：写 cache-friendly 布局
 
@@ -344,7 +373,7 @@ variable suffix:
 
 ### `reference/source-map.md`
 
-记录源材料结构与可公开边界，避免未来忘记来源。
+记录源材料结构、渐进式披露分层索引与可公开边界。每个单元标注已蒸馏到哪一层（L0–L3），避免未来忘记来源或遗漏深层内容。
 
 ### `assets/eval-cases.md`
 
@@ -359,7 +388,7 @@ variable suffix:
 - **不泄露私有事实**：聊天 ID、本地路径、客户资料、项目秘密、凭证不得进入公共 skill。
 - **不把摘要当技能**：没有触发、流程、查漏、验收，就不是 skill。
 - **不因稀疏而漏安全**：医学/营养等高风险任务即使 top-k 很小，也必须跑 safety sweep。
-- **不一次加载全库**：除非人类明确要求做全量审计；日常调用应渐进披露。
+- **不一次加载全库（调用层）**：蒸馏阶段全量产出，但日常调用应渐进披露——先 L0 路由，再 L1/L2 按需加载，L3 仅验收失败时读取。除非人类明确要求做全量审计。
 
 ---
 
@@ -373,6 +402,8 @@ variable suffix:
 - [ ] 有 missed-case sweep，且高风险领域有安全/证据门；
 - [ ] 长材料被拆到 `reference/`，不是塞满入口；
 - [ ] 能区分 shared core、routed expert、heavy reference；
+- [ ] 每个专家都有 L0–L3 渐进式披露分层，蒸馏阶段全量产出；
+- [ ] source map 标注每个单元的渐进层完成状态；
 - [ ] 有至少 5 个 eval cases；
 - [ ] 没有版权原文、私密路径、token、个人聊天内容；
 - [ ] 输出模板清楚说明“来源/边界/下一步”；
@@ -428,8 +459,8 @@ version: 1.0.0
 
 ## 一句话口诀
 
-> **先炼核心，再分专家；先中主脉，再扫旁枝；预算分层，重料后置；路由留痕，越用越准。**
+> **蒸馏全量不丢，渐进披露分层；调用稀疏激活，重料按需加载；先中主脉，再扫旁枝；路由留痕，越用越准。**
 
 或更短：
 
-> **一核常驻，数技稀疏；先抓主症，再查漏诊；重料按需，回流成图。**
+> **全量蒸馏，分层披露；稀疏调用，查漏不漏；重料按需，回流成图。**

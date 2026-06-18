@@ -4,6 +4,7 @@
 
 role: router_and_distillation_workflow
 activation_model: "shared-core + top-k routed experts + missed-case sweep"
+distillation_model: "full extraction + progressive disclosure (L0-L3)"
 
 trigger_terms:
   strong:
@@ -63,28 +64,55 @@ neighbors:
     - lingtai-issue-report
 
 budget:
-  shared_core:
-    target_tokens: "200-800"
-    cache_tier: stable_prefix
-  source_map:
-    target_tokens: "500-1500"
-    cache_tier: stable_or_reference_brief
-  routed_expert:
-    target_tokens: "800-3000"
-    cache_tier: variable_by_task
-  missed_case_sweep:
-    target_tokens: "200-800"
-    cache_tier: stable_checklist
-  heavy_reference:
-    target_tokens: "on-demand only"
-    cache_tier: variable_suffix
-  evals:
-    target_tokens: "small examples, loaded when testing"
-    cache_tier: reference
+  # 蒸馏阶段：全量产出，不设预算限制
+  distillation:
+    mode: "full extraction"
+    layers: ["L0_signature", "L1_brief", "L2_standard", "L3_full"]
+    rule: "不采样、不跳过，所有层全部生成"
+  # 调用阶段：稀疏激活，按层加载
+  runtime:
+    shared_core:
+      target_tokens: "200-800"
+      cache_tier: stable_prefix
+      loads_layer: "L1"
+    source_map:
+      target_tokens: "500-1500"
+      cache_tier: stable_or_reference_brief
+      loads_layer: "L0"
+    routed_expert:
+      target_tokens: "800-3000"
+      cache_tier: variable_by_task
+      loads_layer: "L2"
+    missed_case_sweep:
+      target_tokens: "200-800"
+      cache_tier: stable_checklist
+    heavy_reference:
+      target_tokens: "on-demand only"
+      cache_tier: variable_suffix
+      loads_layer: "L3"
+    evals:
+      target_tokens: "small examples, loaded when testing"
+      cache_tier: reference
 
 sparse_activation:
   default_top_k: 2
   max_top_k: 5
+  progressive_disclosure:
+    rule: "蒸馏全量产出 L0-L3，调用时逐层加载"
+    layers:
+      L0_signature:
+        tokens: "50-100"
+        when: "路由匹配，不加载正文"
+      L1_brief:
+        tokens: "200-500"
+        when: "快速回答，不需展开"
+      L2_standard:
+        tokens: "800-3000"
+        when: "标准任务执行"
+      L3_full:
+        tokens: "unlimited"
+        when: "验收失败 / 深度引用 / 人类要求全量"
+    escalation: "L0 → L1 → L2 → L3，只在当前层无法通过验收门时升级"
   rules:
     - "Always load shared core first."
     - "Select only the strongest expert nodes for the main workflow."
