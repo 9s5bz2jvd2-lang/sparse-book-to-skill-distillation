@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "trial-report.v2",
+  "title": "Privacy-minimized structural and authored-semantic real-material trial report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "report_type", "claims_boundary", "structural_evidence", "authored_semantic_evidence", "query_results", "failures"],
+  "properties": {
+    "contract_version": {"const": "2.0.0"},
+    "report_type": {"const": "real_material_readiness_trial"},
+    "claims_boundary": {"type": "string", "minLength": 1},
+    "structural_evidence": {"type": "object"},
+    "authored_semantic_evidence": {"type": "object"},
+    "query_results": {"type": "array", "items": {"type": "object"}},
+    "failures": {"type": "array", "items": {"type": "object"}}
+  }
+}

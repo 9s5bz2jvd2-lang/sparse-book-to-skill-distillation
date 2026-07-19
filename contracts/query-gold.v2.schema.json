@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "query-gold.v2",
+  "title": "Source-authorized authored sparse-routing evaluation gold",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "authorship", "cases"],
+  "properties": {
+    "contract_version": {"const": "2.0.0"},
+    "authorship": {"const": "human_or_agent_source_grounded_not_generated_by_router"},
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["case_id", "request", "expected_status", "expected_expert_ids", "expected_source_chunk_ids"],
+        "properties": {
+          "case_id": {"type": "string", "minLength": 1},
+          "request": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["contract_version", "query_id", "query", "risk_domains"],
+            "properties": {
+              "contract_version": {"const": "2.0.0"},
+              "query_id": {"type": "string", "minLength": 1},
+              "query": {"type": "string", "minLength": 1},
+              "risk_domains": {"type": "array", "uniqueItems": true, "items": {"enum": ["medical", "nutrition", "legal", "financial", "copyright", "privacy"]}},
+              "top_k": {"type": "integer", "minimum": 1, "maximum": 10}
+            }
+          },
+          "expected_status": {"enum": ["selected", "below_threshold", "bypassed", "rejected"]},
+          "expected_expert_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+          "expected_source_chunk_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+          "human_scores": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["evaluator_label", "route_relevance", "sparse_context_sufficiency", "source_grounding", "notes"],
+            "properties": {
+              "evaluator_label": {"type": "string", "minLength": 1},
+              "route_relevance": {"type": "integer", "minimum": 1, "maximum": 5},
+              "sparse_context_sufficiency": {"type": "integer", "minimum": 1, "maximum": 5},
+              "source_grounding": {"type": "integer", "minimum": 1, "maximum": 5},
+              "notes": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,101 +1,120 @@
-# Output Template — 稀疏蒸馏 Skill 交付模板
+# Human delivery template
 
-用于把一本书、长资料或方法论蒸馏成可调用 skill 时的最终交付结构。
+This is a presentation wrapper, not a machine schema. Machine records use contract `2.0.0` and the exact schemas in `reference/contracts.md`. Do not invent aliases.
 
-## 1. Distillation brief
-
-```markdown
-# <skill-name> 稀疏蒸馏简报
-
-## Source boundary
-- 源材料：
-- 授权/版权状态：
-- 可公开内容：
-- 不可公开内容：
-
-## Shared core
-- 核心定义：
-- 安全/证据/版权红线：
-- 输出原则：
-
-## Routed experts
-| Expert | 触发 | 反触发 | L0 signature | L1 brief | L2 standard | L3 full | 需要加载更多时 |
-|---|---|---|---|---|---|---|---|
-| | | | | | | | |
-
-## Progressive disclosure layers
-- L0 signature (50-100 tok): 路由匹配
-- L1 brief (200-500 tok): 快速回答
-- L2 standard (800-3000 tok): 标准任务
-- L3 full (unlimited): 深度引用，存于 reference/
-- 蒸馏阶段全量产出 L0-L3，调用阶段逐层加载
-
-## Missed-case sweep
-- [ ] 反触发检查
-- [ ] 相邻 skill 检查
-- [ ] 证据/来源检查
-- [ ] 隐私/版权检查
-- [ ] 高风险安全门
-
-## Artifacts
-- `SKILL.md`
-- `ROUTING.yaml`
-- `GRAPH.md`
-- `CACHE.md`
-- `reference/source-map.md` (含渐进式披露分层索引)
-- `reference/<expert-name>.md` (每个专家的 L3 full)
-- `assets/eval-cases.md`
-```
-
-## 2. ROUTING.yaml minimal contract
-
-```yaml
-role: routed_expert_or_router
-distillation_model: "full extraction + progressive disclosure (L0-L3)"
-trigger_terms:
-  strong: []
-  weak: []
-anti_triggers: []
-neighbors:
-  safety: []
-  adjacent: []
-progressive_disclosure:
-  L0_signature: {tokens: "50-100", when: "routing"}
-  L1_brief: {tokens: "200-500", when: "quick answer"}
-  L2_standard: {tokens: "800-3000", when: "standard task"}
-  L3_full: {tokens: "unlimited", when: "acceptance fail / deep ref"}
-  escalation: "L0 -> L1 -> L2 -> L3, only upgrade when current layer fails acceptance"
-budget:
-  distillation: {mode: "full", rule: "no sampling, no skipping"}
-  runtime:
-    shared_core: "200-800"
-    routed_high: "800-3000"
-    routed_low: "200-800"
-    heavy_reference: "on-demand"
-missed_case_sweep:
-  required: []
-route_log_fields: []
-```
-
-## 3. Final answer format to human
+## Full-distillation delivery
 
 ```markdown
-已完成：<skill-name>
+# <skill-name> — source-to-sparse delivery
 
-位置：<path>
+## Human decisions
+- Legal access confirmed by:
+- Intended users:
+- Publication/privacy boundary:
+- High-risk/domain reviewer:
+- License state: repository custom noncommercial source-available | source-specific restriction | other
 
-这次蒸馏把 <source> 转成了：
-1. shared core：<一句话>
-2. routed experts：<列出 2-5 个>
-3. progressive disclosure：<每个专家 L0-L3 全量产出>
-4. missed-case sweep：<列出关键查漏>
-5. budget/cache：<调用预算一句话>
-6. eval cases：<数量/类型>
+## Phase 1 — full source and semantic coverage
+- Workspace:
+- Manifest ID / exact manifest SHA-256:
+- Imported original sources / normalized texts / chunks:
+- Original-byte hashes verified:
+- Gap-free chunk coverage verified:
+- Queue items complete / no-reusable-with-reviewed-reason:
+- Review-state batch size / completed prefix / active batch / resume evidence:
+- Agent/human semantic reviewer:
+- Semantic-review manifest binding / all-chunk list / criteria / limitations:
+- L0 signatures / L1 briefs / L2 workflows / substantive L3 modules:
+- Claim-level chunk/source/line provenance:
+- Shared core replaced and reviewed:
+- Finalize command + exit:
+- Distillation validator command + exit:
 
-注意边界：<版权/隐私/医学/证据红线>
+## Build
+- Build command + exit:
+- Registry ID / build ID / registry SHA-256:
+- Registry path:
+- Matching compact index path:
+- Experts derived from validated records:
 
-下一步可选：
-- 是否发布到共享 skill 库；
-- 是否为它写 HTML explainer；
-- 是否用一个真实任务自测。
+## Phase 2 — sparse reading evidence
+- Query ID / request:
+- Status / decision reason:
+- Selected / skipped semantic experts:
+- Mandatory baseline sweep activated/phase:
+- High-risk / ambiguous / extra checks / safety experts:
+- Exact checksummed files to load:
+- Exact cited source chunks and locators:
+- Audit event sequence:
+
+## Security and limitations
+- Source treated as untrusted data:
+- Generated actions denied/reviewed exception:
+- PDF extraction caveat, if used:
+- Structural validation does not prove semantic correctness:
+- Lexical routing/proxy metrics not represented as semantic AI/token/quality savings:
+
+## Remaining owner/human confirmation
+- License/publication decision:
+- Source/domain review:
+- Other:
 ```
+
+## Canonical query-output summary
+
+Summarize these exact contract-v2 fields; retain the real machine JSON separately:
+
+```json
+{
+  "contract_version": "2.0.0",
+  "registry_id": "distilled-...",
+  "build_id": "build-...",
+  "registry_sha256": "...",
+  "query_id": "...",
+  "status": "selected | below_threshold | bypassed | rejected",
+  "decision_reason": "...",
+  "route_scores": [],
+  "selected_experts": [],
+  "skipped_experts": [],
+  "safety_sweep": {
+    "activated": true,
+    "phase": "post_route",
+    "high_risk": false,
+    "ambiguous": false,
+    "risk_domains": [],
+    "baseline_checks": [],
+    "extra_checks": [],
+    "safety_experts_activated": [],
+    "hits": []
+  },
+  "load_plan": {
+    "path_base": "...",
+    "files_to_load": [],
+    "file_checksums": [],
+    "expert_module_files": [],
+    "source_chunks": []
+  },
+  "audit_log": []
+}
+```
+
+Do not substitute v1/legacy names such as `request_id`, `references_available`, `references_loaded`, `followup_needed`, `task_type`, `neighbor_sweep`, or `budget_tier`.
+
+## Command evidence block
+
+```text
+python3 scripts/intake.py ...                         EXIT=<code>
+python3 scripts/prepare_distillation.py ...           EXIT=<code>
+<agent/human reviewed every chunk>                    REVIEWER=<identity/record>
+python3 scripts/finalize_distillation.py ...          EXIT=<code>
+python3 scripts/validate_distillation.py ...          EXIT=<code>
+python3 scripts/build_registry.py ...                 EXIT=<code>
+python3 scripts/query.py ...                          EXIT=<code>
+python3 scripts/run_lifecycle_tests.py                EXIT=<code>
+python3 scripts/validate.py                           EXIT=<code>
+python3 scripts/check_doc_paths.py                    EXIT=<code>
+```
+
+## Human next step
+
+State whether the result is ready for local use, still semantically incomplete, or blocked by source/license/domain review. Never represent the bundled hand-authored demo artifacts as automated semantics. Never imply that the repository's custom license grants reuse rights to imported source material, and never call it OSI-approved or Creative Commons.

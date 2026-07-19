@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lifecycle-fixtures.v2",
+  "title": "Structured from-zero lifecycle assertions",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "cases"],
+  "properties": {
+    "contract_version": {"const": "2.0.0"},
+    "cases": {
+      "type": "array",
+      "minItems": 15,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["case_id", "category", "expected"],
+        "properties": {
+          "case_id": {"type": "string", "minLength": 1},
+          "category": {"enum": ["intake", "source_symlink", "unprocessed_chunk", "missing_chunk", "bad_artifact_hash", "bad_source_hash", "bad_provenance", "bad_provenance_source", "missing_l3", "build_refuses_unvalidated", "build", "sparse_query", "stable_tie", "top_k", "anti_trigger", "expert_anti_trigger", "reject_anti_trigger", "below_threshold", "safety_sweep", "ambiguous_sweep", "malformed_input", "schema_mismatch", "index_mismatch", "registry_mismatch", "changed_l3_file", "changed_shared_core", "changed_load_file", "demo_cleanup"]},
+          "request": {"type": "object"},
+          "expected": {"type": "object"}
+        }
+      }
+    }
+  }
+}

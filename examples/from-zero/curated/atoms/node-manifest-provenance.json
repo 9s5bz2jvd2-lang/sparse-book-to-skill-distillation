@@ -1,0 +1,69 @@
+{
+  "contract_version": "1.0.0",
+  "node_id": "manifest-provenance-workflow",
+  "node_kind": "workflow_step",
+  "title": "Manifest Provenance Tracking Workflow",
+  "content": "To track manifest provenance: 1) hash every source file and derive stable source_ids, 2) create non-overlapping chunks with deterministic chunk_ids from source_id+line_range+content, 3) record every chunk in a source manifest with gap-free coverage, 4) bind each distilled artifact to its chunk via chunk_id and chunk_sha256.",
+  "source_ref": {
+    "ref_type": "chunk",
+    "chunk_id": "chunk-199c1e4f467e3bd46732",
+    "source_id": "src-ce2f45ce20bb732c",
+    "start_line": 1,
+    "end_line": 6,
+    "claim": "Provenance workflow from sparse-reader module"
+  },
+  "dependencies": [
+    {
+      "target_node_id": "coverage-definition",
+      "relation_type": "prerequisite",
+      "reason": "Must understand coverage before tracking provenance"
+    }
+  ],
+  "relations": [
+    {
+      "target_node_id": "safety-no-partial-coverage",
+      "relation_type": "safety_requires",
+      "reason": "Provenance tracking must enforce no partial coverage"
+    }
+  ],
+  "triggers": [
+    {"term": "manifest", "weight": 8},
+    {"term": "provenance", "weight": 9},
+    {"term": "source_id", "weight": 6},
+    {"term": "chunk_id", "weight": 7},
+    {"term": "hash", "weight": 4},
+    {"term": "tracking", "weight": 3}
+  ],
+  "anti_triggers": [],
+  "scope": {
+    "applicability": "any distillation workflow requiring source-to-artifact traceability",
+    "exceptions": []
+  },
+  "validation_state": "validated",
+  "safety_red_lines": [],
+  "vectors": [
+    {
+      "channel_name": "semantic",
+      "dimension": 4,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.7, 0.6, 0.2, 0.1]
+    },
+    {
+      "channel_name": "task",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.6, 0.7, 0.3]
+    },
+    {
+      "channel_name": "risk",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.2, 0.1, 0.0]
+    }
+  ],
+  "expert_id": "coverage-ledger",
+  "routing_priority": 0
+}

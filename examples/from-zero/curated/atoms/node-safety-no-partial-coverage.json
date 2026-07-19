@@ -1,0 +1,64 @@
+{
+  "contract_version": "1.0.0",
+  "node_id": "safety-no-partial-coverage",
+  "node_kind": "red_line",
+  "title": "Safety: No Partial Coverage Allowed",
+  "content": "Every source chunk must be either fully processed (complete) or explicitly marked as having no reusable knowledge (complete_no_reusable_knowledge). A 'pending' chunk in a finalized workspace is a hard safety violation. No chunk may be silently skipped.",
+  "source_ref": {
+    "ref_type": "chunk",
+    "chunk_id": "chunk-142536ab10af131e3e9d",
+    "source_id": "src-ce2f45ce20bb732c",
+    "start_line": 13,
+    "end_line": 16,
+    "claim": "Safety governance rule from safety-governance L3"
+  },
+  "dependencies": [],
+  "relations": [
+    {
+      "target_node_id": "coverage-definition",
+      "relation_type": "supports",
+      "reason": "Coverage completeness is a safety prerequisite"
+    }
+  ],
+  "triggers": [
+    {"term": "partial coverage", "weight": 8},
+    {"term": "safety", "weight": 5},
+    {"term": "no reusable", "weight": 6},
+    {"term": "pending chunk", "weight": 7},
+    {"term": "skip", "weight": 4}
+  ],
+  "anti_triggers": ["ignore safety"],
+  "scope": {
+    "applicability": "all distillation finalization steps",
+    "exceptions": []
+  },
+  "validation_state": "validated",
+  "safety_red_lines": ["Never finalize with pending chunks", "Never silently drop source material"],
+  "global_invariant": true,
+  "risk_domains": ["coverage_integrity"],
+  "vectors": [
+    {
+      "channel_name": "semantic",
+      "dimension": 4,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.1, 0.1, 0.9, 0.4]
+    },
+    {
+      "channel_name": "task",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.1, 0.2, 0.9]
+    },
+    {
+      "channel_name": "risk",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.9, 0.8, 0.7]
+    }
+  ],
+  "expert_id": "safety-governance",
+  "routing_priority": 0
+}

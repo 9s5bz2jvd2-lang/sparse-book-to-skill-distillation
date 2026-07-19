@@ -1,0 +1,86 @@
+{
+  "contract_version": "1.0.0",
+  "node_id": "evidence-hash-stability",
+  "node_kind": "evidence",
+  "title": "Evidence: Hash-Based Stability Guarantee",
+  "content": "Empirical evidence from the v2 lifecycle: every chunk_id, source_id, manifest_id, and build_id is derived from SHA-256 hashes of canonical content. This means any byte-level change to source material, chunks, or distilled artifacts is detected deterministically. The evidence shows zero false-negative hash collisions across all lifecycle tests.",
+  "source_ref": {
+    "ref_type": "synthetic_fixture",
+    "fixture_label": "empirical-lifecycle-evidence"
+  },
+  "dependencies": [
+    {
+      "target_node_id": "manifest-provenance-workflow",
+      "relation_type": "supports",
+      "reason": "Hash stability is evidence supporting the provenance workflow"
+    }
+  ],
+  "relations": [],
+  "triggers": [
+    {
+      "term": "hash",
+      "weight": 7
+    },
+    {
+      "term": "stability",
+      "weight": 6
+    },
+    {
+      "term": "evidence",
+      "weight": 9
+    },
+    {
+      "term": "sha256",
+      "weight": 8
+    },
+    {
+      "term": "deterministic",
+      "weight": 5
+    }
+  ],
+  "anti_triggers": [],
+  "scope": {
+    "applicability": "validating integrity of any hash-bound lifecycle artifact",
+    "exceptions": []
+  },
+  "validation_state": "provisional",
+  "safety_red_lines": [],
+  "vectors": [
+    {
+      "channel_name": "semantic",
+      "dimension": 4,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [
+        0.3,
+        0.4,
+        0.2,
+        0.9
+      ]
+    },
+    {
+      "channel_name": "task",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [
+        0.4,
+        0.5,
+        0.3
+      ]
+    },
+    {
+      "channel_name": "risk",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [
+        0.1,
+        0.1,
+        0.0
+      ]
+    }
+  ],
+  "expert_id": "coverage-ledger",
+  "routing_priority": 2
+}

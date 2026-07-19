@@ -1,0 +1,92 @@
+{
+  "contract_version": "1.0.0",
+  "node_id": "counterexample-unstructured-summary",
+  "node_kind": "counterexample",
+  "title": "Counterexample: Unstructured Summarization Anti-Pattern",
+  "content": "An unstructured 'just summarize the source' request is a counterexample to good distillation practice. It bypasses chunk-level provenance, produces no addressable knowledge nodes, and cannot be verified against source lines. The correct response is to route through the distillation lifecycle, not produce a flat summary.",
+  "source_ref": {
+    "ref_type": "synthetic_fixture",
+    "fixture_label": "anti-pattern-demonstration"
+  },
+  "dependencies": [
+    {
+      "target_node_id": "semantic-distill-condition",
+      "relation_type": "contradicts",
+      "reason": "Unstructured summarization contradicts the conditions for valid distillation"
+    }
+  ],
+  "relations": [
+    {
+      "target_node_id": "safety-no-partial-coverage",
+      "relation_type": "supports",
+      "reason": "Rejecting unstructured summaries supports partial coverage prevention"
+    }
+  ],
+  "triggers": [
+    {
+      "term": "summarize",
+      "weight": 7
+    },
+    {
+      "term": "unstructured",
+      "weight": 6
+    },
+    {
+      "term": "anti-pattern",
+      "weight": 8
+    },
+    {
+      "term": "counterexample",
+      "weight": 9
+    },
+    {
+      "term": "just answer",
+      "weight": 5
+    }
+  ],
+  "anti_triggers": [],
+  "scope": {
+    "applicability": "demonstrating what NOT to do during distillation",
+    "exceptions": []
+  },
+  "validation_state": "provisional",
+  "safety_red_lines": [],
+  "vectors": [
+    {
+      "channel_name": "semantic",
+      "dimension": 4,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [
+        0.1,
+        0.7,
+        0.5,
+        0.3
+      ]
+    },
+    {
+      "channel_name": "task",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [
+        0.2,
+        0.8,
+        0.5
+      ]
+    },
+    {
+      "channel_name": "risk",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [
+        0.3,
+        0.2,
+        0.1
+      ]
+    }
+  ],
+  "expert_id": "semantic-distillation",
+  "routing_priority": 2
+}

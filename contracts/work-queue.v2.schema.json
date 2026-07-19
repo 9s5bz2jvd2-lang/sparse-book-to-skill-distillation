@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "work-queue.v2",
+  "title": "Chunk-complete semantic distillation work queue",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "source_manifest_sha256", "semantic_processing", "items"],
+  "properties": {
+    "contract_version": {"const": "2.0.0"},
+    "source_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "semantic_processing": {"const": "required_for_every_chunk_by_agent_or_human"},
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["chunk_id", "chunk_path", "artifact_path", "status"],
+        "properties": {
+          "chunk_id": {"type": "string"},
+          "chunk_path": {"type": "string"},
+          "artifact_path": {"type": "string"},
+          "status": {"enum": ["pending", "complete", "complete_no_reusable_knowledge"]}
+        }
+      }
+    }
+  }
+}

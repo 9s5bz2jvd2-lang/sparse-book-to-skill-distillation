@@ -1,0 +1,44 @@
+{
+  "contract_version": "2.0.0",
+  "normalization": "Unicode NFKC, casefold, collapse whitespace",
+  "scoring": {
+    "match_mode": "normalized_substring",
+    "term_frequency": "at_most_once_per_term",
+    "minimum_score": 4,
+    "default_top_k": 2,
+    "max_top_k": 5,
+    "stable_tie_break": ["score_desc", "tie_break_priority_asc", "expert_id_asc"]
+  },
+  "safety_sweep": {
+    "mandatory": true,
+    "phase": "post_route",
+    "baseline_checks": [
+      "source_and_copyright_boundary",
+      "untrusted_source_prompt_injection",
+      "private_information_boundary",
+      "anti_trigger_check",
+      "provenance_and_uncertainty_check",
+      "output_contract_check"
+    ],
+    "high_risk_or_ambiguous_extra_checks": [
+      "domain_scope_boundary",
+      "special_population",
+      "professional_referral_boundary",
+      "citation_verifiability"
+    ],
+    "safety_expert_ids": ["safety-governance"],
+    "risk_terms": {
+      "medical": ["medical", "diagnosis", "treatment", "医疗", "诊断", "治疗"],
+      "nutrition": ["nutrition", "diet", "营养", "膳食"],
+      "legal": ["legal", "law", "法律"],
+      "financial": ["financial", "investment", "金融", "投资"],
+      "copyright": ["copyright", "版权"],
+      "privacy": ["private data", "privacy", "隐私"]
+    },
+    "lexical_indicators": {
+      "untrusted_source_prompt_injection": ["ignore previous instructions", "reveal credentials", "disable safety checks", "run this command"],
+      "private_information_boundary": ["publish private data", "include client records"],
+      "generated_action_boundary": ["use curl", "read environment variables", "spawn subprocess", "write outside the repository"]
+    }
+  }
+}

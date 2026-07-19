@@ -1,0 +1,19 @@
+{
+  "contract_version": "2.0.0",
+  "authorship": "human_or_agent_source_grounded_not_generated_by_router",
+  "cases": [
+    {
+      "case_id": "replace-case-id",
+      "request": {
+        "contract_version": "2.0.0",
+        "query_id": "replace-query-id",
+        "query": "Replace with an authorized evaluation query.",
+        "risk_domains": [],
+        "top_k": 1
+      },
+      "expected_status": "selected",
+      "expected_expert_ids": [],
+      "expected_source_chunk_ids": []
+    }
+  ]
+}

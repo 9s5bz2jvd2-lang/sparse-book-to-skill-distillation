@@ -1,0 +1,68 @@
+{
+  "contract_version": "2.0.0",
+  "artifact_type": "distilled_chunk",
+  "chunk_id": "chunk-199c1e4f467e3bd46732",
+  "chunk_sha256": "6a76491a743e18bbc81c538eaaaf987ceb0312e13349299aeb32d2749ae53a0c",
+  "processing_status": "complete",
+  "chunk_summary": "Full distillation starts with a complete source inventory, normalized text hashes, stable line chunks, and a queue that cannot remain pending.",
+  "chunk_provenance": {
+    "source_id": "src-ce2f45ce20bb732c",
+    "start_line": 1,
+    "end_line": 6,
+    "page_range": []
+  },
+  "knowledge_nodes": [
+    {
+      "node_id": "coverage-ledger-core",
+      "expert_id": "coverage-ledger",
+      "title": "Source intake and coverage ledger",
+      "routing_priority": 10,
+      "l0": {
+        "trigger_terms": [
+          {"term": "source inventory", "weight": 6},
+          {"term": "coverage ledger", "weight": 6},
+          {"term": "stable chunk", "weight": 5},
+          {"term": "full text status", "weight": 5},
+          {"term": "manifest", "weight": 4},
+          {"term": "hash", "weight": 2}
+        ],
+        "anti_trigger_terms": ["just answer one fact"],
+        "one_liner": "Inventory and hash every source, create stable line chunks, and block completion while any chunk is pending."
+      },
+      "l1": {
+        "brief": "A complete source manifest and gap-free chunk ledger establish the boundary that semantic distillation must cover.",
+        "safety_red_lines": ["Do not claim full_text_status complete for unsupported, unreadable, or skipped visible source files."],
+        "uncertainties": ["A hash establishes byte identity, not truth, ownership, or semantic quality."]
+      },
+      "l2": {
+        "workflow": [
+          "Enumerate every supported source file and reject unsupported visible files.",
+          "Copy normalized full text, hash original and normalized bytes, and create stable line-bounded chunks.",
+          "Create one pending work item per chunk and require a validated semantic artifact before completion."
+        ],
+        "load_more_if": ["The source changed after intake or chunk coverage has a gap."]
+      },
+      "l3": {"path": "distilled/l3/coverage-ledger.md"},
+      "risk_tags": ["copyright", "privacy"],
+      "provenance": [
+        {
+          "chunk_id": "chunk-199c1e4f467e3bd46732",
+          "source_id": "src-ce2f45ce20bb732c",
+          "start_line": 3,
+          "end_line": 6,
+          "claim": "Inventory, hashes, stable chunks, and pending-queue completeness form the coverage gate."
+        }
+      ]
+    }
+  ],
+  "anti_trigger_notes": [
+    {
+      "term": "summarize only",
+      "action": "bypass",
+      "scope": "global",
+      "reason": "A summary-only request does not require the full skill lifecycle."
+    }
+  ],
+  "uncertainties": ["The source's own redistribution terms still require human review outside this synthetic fixture."],
+  "no_reusable_reason": ""
+}

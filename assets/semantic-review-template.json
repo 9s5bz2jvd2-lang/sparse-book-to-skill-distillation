@@ -1,0 +1,21 @@
+{
+  "contract_version": "2.0.0",
+  "review_status": "pending",
+  "source_manifest_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewer": {
+    "reviewer_type": "agent",
+    "reviewer_label": "REPLACE_WITH_REVIEWER"
+  },
+  "review_method": "entire_chunk_read_with_source_locator_verification",
+  "reviewed_chunk_ids": [],
+  "criteria": {
+    "claims_source_grounded": false,
+    "meaning_faithful": false,
+    "uncertainty_recorded": false,
+    "routing_terms_reviewed": false,
+    "l3_usefulness_reviewed": false
+  },
+  "limitations": ["REPLACE_WITH_SOURCE_OR_REVIEW_LIMITATIONS"],
+  "review_assertion": "REPLACE: author this assertion only after source-aware semantic review.",
+  "semantic_quality_not_automated": true
+}

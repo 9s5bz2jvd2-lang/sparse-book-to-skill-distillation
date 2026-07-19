@@ -1,0 +1,57 @@
+{
+  "contract_version": "1.0.0",
+  "node_id": "sparse-activation-formula",
+  "node_kind": "formula",
+  "title": "Sparse Activation Scoring Formula",
+  "content": "Expert/node score = sum of trigger_term.weight for each normalized trigger term found in the query text. A node is eligible if score >= minimum_score AND no anti_trigger_term matches the query. Ties are broken by routing_priority (ascending) then node_id (lexicographic).",
+  "source_ref": {
+    "ref_type": "chunk",
+    "chunk_id": "chunk-9098d1d1be6b4b5effdd",
+    "source_id": "src-ce2f45ce20bb732c",
+    "start_line": 7,
+    "end_line": 12,
+    "claim": "Sparse activation formula from sparse-reader module"
+  },
+  "dependencies": [],
+  "relations": [],
+  "triggers": [
+    {"term": "score", "weight": 7},
+    {"term": "formula", "weight": 8},
+    {"term": "activation", "weight": 6},
+    {"term": "sparse", "weight": 5},
+    {"term": "threshold", "weight": 6},
+    {"term": "routing", "weight": 4}
+  ],
+  "anti_triggers": [],
+  "scope": {
+    "applicability": "query-time routing decisions in any graph-sparse system",
+    "exceptions": []
+  },
+  "validation_state": "validated",
+  "safety_red_lines": [],
+  "vectors": [
+    {
+      "channel_name": "semantic",
+      "dimension": 4,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.2, 0.5, 0.1, 0.8]
+    },
+    {
+      "channel_name": "task",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.5, 0.4, 0.3]
+    },
+    {
+      "channel_name": "risk",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.0, 0.1, 0.0]
+    }
+  ],
+  "expert_id": "sparse-reader",
+  "routing_priority": 1
+}

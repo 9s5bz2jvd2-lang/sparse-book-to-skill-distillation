@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "node-vector.v1",
+  "title": "Named multi-dimensional vector attached to an atomic node",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "channel_name",
+    "dimension",
+    "model_id",
+    "model_version",
+    "values"
+  ],
+  "properties": {
+    "channel_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Named channel, e.g. semantic, task, risk, evidence"
+    },
+    "dimension": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Vector dimension; must match len(values)"
+    },
+    "model_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Embedding model identifier; fixture vectors use 'synthetic_fixture'"
+    },
+    "model_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Version string of the embedding model"
+    },
+    "values": {
+      "type": "array",
+      "items": {"type": "number"},
+      "minItems": 1,
+      "description": "Numeric vector values; all must be finite"
+    }
+  }
+}

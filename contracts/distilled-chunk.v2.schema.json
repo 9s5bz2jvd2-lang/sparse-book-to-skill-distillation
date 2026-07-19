@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "distilled-chunk.v2",
+  "title": "Agent-authored semantic distillation result for one source chunk",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "artifact_type", "chunk_id", "chunk_sha256", "processing_status", "chunk_summary", "chunk_provenance", "knowledge_nodes", "anti_trigger_notes", "uncertainties", "no_reusable_reason"],
+  "properties": {
+    "contract_version": {"const": "2.0.0"},
+    "artifact_type": {"const": "distilled_chunk"},
+    "chunk_id": {"type": "string"},
+    "chunk_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "processing_status": {"enum": ["pending", "complete", "complete_no_reusable_knowledge"]},
+    "chunk_summary": {"type": "string"},
+    "chunk_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "start_line", "end_line", "page_range"],
+      "properties": {
+        "source_id": {"type": "string"},
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "page_range": {"type": "array", "items": {"type": "integer", "minimum": 1}}
+      }
+    },
+    "knowledge_nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["node_id", "expert_id", "title", "routing_priority", "l0", "l1", "l2", "l3", "risk_tags", "provenance"],
+        "properties": {
+          "node_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "expert_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "title": {"type": "string", "minLength": 1},
+          "routing_priority": {"type": "integer", "minimum": 0},
+          "l0": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["trigger_terms", "anti_trigger_terms", "one_liner"],
+            "properties": {
+              "trigger_terms": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["term", "weight"],
+                  "properties": {
+                    "term": {"type": "string", "minLength": 1},
+                    "weight": {"type": "integer", "minimum": 1, "maximum": 20}
+                  }
+                }
+              },
+              "anti_trigger_terms": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+              "one_liner": {"type": "string", "minLength": 1}
+            }
+          },
+          "l1": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["brief", "safety_red_lines", "uncertainties"],
+            "properties": {
+              "brief": {"type": "string", "minLength": 1},
+              "safety_red_lines": {"type": "array", "items": {"type": "string"}},
+              "uncertainties": {"type": "array", "items": {"type": "string"}}
+            }
+          },
+          "l2": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["workflow", "load_more_if"],
+            "properties": {
+              "workflow": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+              "load_more_if": {"type": "array", "items": {"type": "string"}}
+            }
+          },
+          "l3": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path"],
+            "properties": {"path": {"type": "string", "minLength": 1}}
+          },
+          "risk_tags": {"type": "array", "uniqueItems": true, "items": {"enum": ["medical", "nutrition", "legal", "financial", "copyright", "privacy"]}},
+          "provenance": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["chunk_id", "source_id", "start_line", "end_line", "claim"],
+              "properties": {
+                "chunk_id": {"type": "string"},
+                "source_id": {"type": "string"},
+                "start_line": {"type": "integer", "minimum": 1},
+                "end_line": {"type": "integer", "minimum": 1},
+                "claim": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        }
+      }
+    },
+    "anti_trigger_notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["term", "action", "scope", "reason"],
+        "properties": {
+          "term": {"type": "string", "minLength": 1},
+          "action": {"enum": ["bypass", "reject"]},
+          "scope": {"const": "global"},
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "uncertainties": {"type": "array", "items": {"type": "string"}},
+    "no_reusable_reason": {"type": "string"}
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vector-index.v1",
+  "title": "Versioned multidimensional vector sidecar bound to a graph registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "graph_id", "channels", "node_vectors"],
+  "properties": {
+    "contract_version": {"const": "1.0.0"},
+    "graph_id": {"type": "string", "minLength": 1},
+    "channels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["channel_name", "dimension", "model_id", "model_version", "weight"],
+        "properties": {
+          "channel_name": {"type": "string", "minLength": 1},
+          "dimension": {"type": "integer", "minimum": 1},
+          "model_id": {"type": "string", "minLength": 1},
+          "model_version": {"type": "string", "minLength": 1},
+          "weight": {"type": "number"}
+        }
+      }
+    },
+    "node_vectors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["node_id", "channel_name", "dimension", "model_id", "model_version", "values"],
+        "properties": {
+          "node_id": {"type": "string", "minLength": 1},
+          "channel_name": {"type": "string", "minLength": 1},
+          "dimension": {"type": "integer", "minimum": 1},
+          "model_id": {"type": "string", "minLength": 1},
+          "model_version": {"type": "string", "minLength": 1},
+          "values": {"type": "array", "minItems": 1, "items": {"type": "number"}}
+        }
+      }
+    }
+  }
+}

@@ -1,81 +1,47 @@
-# Sparse Book-to-Skill Distillation — Structure Diagram
+# Sparse Book-to-Skill Distillation — structure
 
-This diagram shows how a long source such as a book, textbook, course, or project methodology is distilled into a sparse, callable Skill system.
+The canonical Mermaid source is `assets/structure-diagram.mmd`. It separates the agent-reviewed full pass from repeated sparse reading, makes registry/index derivation explicit, and makes the post-route baseline safety sweep unconditional.
 
 ```mermaid
 flowchart TD
-    A[Book / Textbook / Long Methodology<br/>书籍·教材·课程·长资料] --> B[Distillation Pass<br/>提炼：核心判断 / 场景 / 红线 / 输出]
+    S[Authorized local sources<br/>untrusted data] --> I[Import original bytes + normalized full text]
+    I --> Q[Hash + gap-free chunks + pending queue/templates]
+    Q --> RQ[Durable contiguous review batch + resume state]
+    RQ --> A[Agent/human reads every complete chunk]
+    A --> L[Source-grounded L0 + L1 + L2 + substantive L3]
+    L --> SR[Authored all-chunk semantic-review declaration]
+    SR --> F[Finalize queue + source map]
+    F --> V[Completeness + hash + provenance validation]
+    V --> B[Derived registry v2 + compact matching index v2]
 
-    B --> C[Shared Core<br/>常驻核心]
-    B --> D[Skill Experts<br/>局部专家群]
-    B --> E[References & Assets<br/>重资料 / 模板 / 案例]
+    U[Versioned query] --> X[Validate query + registry/index identity]
+    B --> X
+    X --> G[Lexical anti-trigger + weighted score + threshold + stable top-k]
+    G --> W[Mandatory post-route baseline safety sweep]
+    W --> H{High-risk or ambiguous?}
+    H -->|yes| SG[Extra checks + safety module outside semantic top-k]
+    H -->|no| P[Exact checksummed sparse load plan]
+    SG --> P
+    P --> O[Selected shared core + L3 + cited chunks + audit]
 
-    C --> C1[Evidence / Safety / Copyright<br/>证据边界·安全红线·版权边界]
-    C --> C2[Output Contract<br/>交付格式·验收标准]
-
-    D --> D1[Expert A<br/>章节 / 方法 / 场景 A]
-    D --> D2[Expert B<br/>章节 / 方法 / 场景 B]
-    D --> D3[Expert C<br/>章节 / 方法 / 场景 C]
-
-    E --> E1[reference/<br/>按需深读]
-    E --> E2[scripts/<br/>可执行工具]
-    E --> E3[assets/<br/>模板·评测·案例]
-
-    U[User / Agent Task<br/>当前任务] --> G[Lightweight Gate<br/>ROUTING.yaml<br/>轻门控：触发 / 反触发 / 预算]
-
-    G -->|top-k hit| D1
-    G -->|top-k hit| D2
-    G -->|if needed| R[Missed-case Sweep<br/>低预算查漏]
-
-    R --> X1[Red Flags<br/>红旗 / 禁忌]
-    R --> X2[Neighbor Skills<br/>邻近主题]
-    R --> X3[Special Populations<br/>特殊人群 / 边界条件]
-
-    D1 --> O[Task Output<br/>产出]
-    D2 --> O
-    X1 --> O
-    X2 --> O
-    X3 --> O
-    C1 --> O
-    C2 --> O
-
-    O --> V[Validation / Evals<br/>验收与自检]
-    V --> L[Route Log / Gotchas<br/>路径记录·踩坑·误触发]
-    L --> K[Cache & Graph Update<br/>回流：更短签名 / 更准邻接 / 更好缓存]
-    K --> G
-
-    classDef core fill:#fff4cc,stroke:#d6a700,color:#222;
-    classDef gate fill:#e8f0ff,stroke:#4b6fd6,color:#111;
-    classDef expert fill:#edf8ed,stroke:#3b8f45,color:#111;
-    classDef risk fill:#ffecec,stroke:#d95c5c,color:#111;
-    classDef loop fill:#f2eaff,stroke:#8a5bd6,color:#111;
-
-    class C,C1,C2 core;
-    class G gate;
-    class D,D1,D2,D3 expert;
-    class R,X1,X2,X3 risk;
-    class V,L,K loop;
+    O --> R{Human proposes a real fix?}
+    R -->|no| Z[Done]
+    R -->|yes| HR[Human review + lifecycle regressions]
+    HR -->|explicit rebuild/merge| B
+    HR -->|reject| Z
 ```
 
-## One-line model
+## Normative reading
 
-```text
-Book
-  -> shared core + routed experts + heavy references
-  -> lightweight gate
-  -> top-k activation + missed-case sweep
-  -> output + validation
-  -> route log / gotcha / eval feedback
-  -> better cache hit next time
-```
+- Phase 1 imports every declared supported source and covers every normalized-text line exactly once.
+- Deterministic code creates queue/templates but does not author semantic knowledge.
+- An agent/human reads every complete chunk and writes source-grounded L0–L3 or a reviewed no-reusable reason.
+- Build is reachable only after complete hash/coverage/provenance/L3/shared-core validation.
+- Registry and compact index are derived together and cross-validated at query time.
+- The lexical gate is deterministic index matching, not semantic AI.
+- Every contract-valid selected, no-hit, bypassed, or rejected route reaches the baseline post-route sweep.
+- High-risk/ambiguous extra checks and safety L3 are outside semantic top-k.
+- The final plan contains only exact selected/safety L3 plus cited chunks, with checksums and audit events.
+- Feedback cannot mutate or merge artifacts until a human reviews and lifecycle regressions pass.
 
-## Chinese shorthand
-
-> 先炼核心，再分专家；先中主脉，再扫旁枝；预算分层，重料后置；路由留痕，越用越准。
-
-> 网给 Skill 以通达，环给 Skill 以低功耗；分支出去，回流成丹。
-
-
-## Proposal-based self-evolution
-
-The feedback loop is intentionally not a hidden auto-mutation loop. Route logs, gotchas, and missed cases should become **reviewable patches** to `ROUTING.yaml`, `GRAPH.md`, `CACHE.md`, and eval cases. See [`self-evolution-loop.md`](self-evolution-loop.md).
+Run `python3 scripts/run_lifecycle_demo.py` for the synthetic source-to-query trace.

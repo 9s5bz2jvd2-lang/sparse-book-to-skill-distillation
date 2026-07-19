@@ -1,0 +1,27 @@
+{
+  "contract_version": "2.0.0",
+  "review_status": "complete",
+  "source_manifest_sha256": "39d481452d961353bfd3da9385c8a2431476a543603ced659b74667ce198c826",
+  "reviewer": {
+    "reviewer_type": "human_and_agent",
+    "reviewer_label": "repository synthetic fixture authors"
+  },
+  "review_method": "entire_chunk_read_with_source_locator_verification",
+  "reviewed_chunk_ids": [
+    "chunk-199c1e4f467e3bd46732",
+    "chunk-9098d1d1be6b4b5effdd",
+    "chunk-142536ab10af131e3e9d"
+  ],
+  "criteria": {
+    "claims_source_grounded": true,
+    "meaning_faithful": true,
+    "uncertainty_recorded": true,
+    "routing_terms_reviewed": true,
+    "l3_usefulness_reviewed": true
+  },
+  "limitations": [
+    "This attestation covers only the repository-authored synthetic fixture and is not evidence of real-book semantic quality."
+  ],
+  "review_assertion": "The fixture authors read every complete synthetic chunk and reviewed the authored records and modules against those chunks.",
+  "semantic_quality_not_automated": true
+}

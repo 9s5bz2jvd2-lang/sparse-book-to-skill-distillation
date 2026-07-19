@@ -1,16 +1,26 @@
 flowchart TD
-    A[Book / Textbook / Long Methodology] --> B[Distillation Pass]
-    B --> C[Shared Core]
-    B --> D[Skill Experts]
-    B --> E[References & Assets]
-    U[User / Agent Task] --> G[Lightweight Gate: ROUTING.yaml]
-    G -->|top-k hit| D
-    G -->|if needed| R[Missed-case Sweep]
-    C --> O[Task Output]
-    D --> O
-    E --> O
-    R --> O
-    O --> V[Validation / Evals]
-    V --> L[Route Log / Gotchas]
-    L --> K[Cache & Graph Update]
-    K --> G
+    S[Authorized local sources<br/>untrusted data] --> I[Import original bytes + normalized full text]
+    I --> Q[Hash + gap-free chunks + pending queue/templates]
+    Q --> RQ[Durable contiguous review batch + resume state]
+    RQ --> A[Agent/human reads every complete chunk]
+    A --> L[Source-grounded L0 + L1 + L2 + substantive L3]
+    L --> SR[Authored all-chunk semantic-review declaration]
+    SR --> F[Finalize queue + source map]
+    F --> V[Completeness + hash + provenance validation]
+    V --> B[Derived registry v2 + compact matching index v2]
+
+    U[Versioned query] --> X[Validate query + registry/index identity]
+    B --> X
+    X --> G[Lexical anti-trigger + weighted score + threshold + stable top-k]
+    G --> W[Mandatory post-route baseline safety sweep]
+    W --> H{High-risk or ambiguous?}
+    H -->|yes| SG[Extra checks + safety module outside semantic top-k]
+    H -->|no| P[Exact checksummed sparse load plan]
+    SG --> P
+    P --> O[Selected shared core + L3 + cited chunks + audit]
+
+    O --> R{Human proposes a real fix?}
+    R -->|no| Z[Done]
+    R -->|yes| HR[Human review + lifecycle regressions]
+    HR -->|explicit rebuild/merge| B
+    HR -->|reject| Z

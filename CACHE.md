@@ -1,169 +1,74 @@
-# CACHE.md — 稀疏蒸馏的缓存友好布局
+# Cache and progressive-loading policy
 
-目标：让 skill 调用既低功耗，又不把每次变化的用户资料、检索片段、长引用塞进稳定前缀，避免"看似低功耗，实际多耗 token"。
+This file governs invocation layout for contract `2.0.0`; it does not redefine machine fields or scores. The built `expert-index.v2.json`, its matching `expert-registry.v2.json`, `contracts/routing-policy.v2.json`, and contract-v2 schemas are normative.
 
-> **核心原则**：蒸馏阶段全量产出 L0–L3 所有层，不丢任何知识；以下缓存布局仅约束**调用阶段**的加载策略。蒸馏不省钱，调用才省钱。
+## Phase boundary
 
-## 1. 稳定前缀 stable prefix
+Cache/sparsity policy applies only after one-time full distillation and validation. Phase 1 must read every declared source chunk and create/review all semantic artifacts; no cache goal may justify sampling or skipping L0–L3.
 
-适合长期不变、可缓存、可放在入口或常驻提示中的内容：
+## Stable prefix
 
-- skill 名称与一句话用途；
-- shared core：版权、隐私、安全、证据红线；
-- routing schema：top-k、budget tier、missed-case sweep 的结构；
-- 输出契约；
-- 验收清单；
-- 通用查漏项。
+Keep only stable, compact rules:
 
-要求：
+- the Skill routing identity/invariant;
+- the built `distilled/shared-core.md`;
+- the compact built index needed for deterministic selection;
+- mandatory baseline sweep semantics;
+- the query-output/load contract.
 
-- 尽量短，200–800 tokens；
-- 少改动；
-- 不包含当前用户私有数据；
-- 不包含长原文/长 excerpt；
-- 不包含一次性 route decision。
+Do not place current query text, source bodies, retrieved chunks, private data, absolute host paths, route output, or long task history in a reusable prompt prefix.
 
-## 2. 变量后缀 variable suffix
+## Variable suffix and exact sparse plan
 
-必须放在后面、按任务变化的内容：
+After validating the matching registry/index and scoring the current request, load exactly:
 
-- 用户当前任务；
-- 源材料片段；
-- 选中的 routed experts；
-- route log；
-- 当前草稿；
-- 人类偏好；
-- 私有路径、临时文件名（若只能本 agent 使用）。
+1. `load_plan.files_to_load`: shared core followed by selected semantic L3 modules and any high-risk/ambiguous safety L3 module;
+2. `load_plan.source_chunks`: the selected experts' cited source chunks with exact source/line/page locators;
+3. current task/draft state;
+4. the compact audit record.
 
-## 3. 按需引用 on-demand reference
+The query implementation verifies the registry SHA/build ID, index-registry equality, shared-core/L3 checksums, and selected chunk checksums before returning the plan. L3 is fully created in Phase 1 but only the selected/safety subset is loaded in Phase 2.
 
-> 蒸馏阶段已全量产出 L3 full 内容并存储在 `reference/` 中。以下"按需"指的是**调用阶段不默认加载 L3**，而非蒸馏阶段不产出 L3。
-
-只有在最小流程无法通过验收门时才加载：
-
-- 长理论解释；
-- 大量案例；
-- 原文摘录（且必须合法、短摘、标注来源）；
-- 复杂 schema；
-- 全量 eval；
-- 具体项目历史。
-
-## 4. 调用预算建议
-
-> 以下预算仅约束调用阶段的加载量。蒸馏阶段全量产出所有层，不受此预算限制。
-
-| 内容 | 默认调用预算 | 何时升级 |
-|---|---:|---|
-| shared core (≈L1) | 200–800 tokens | 几乎不升级 |
-| source map (L0) | 500–1500 tokens | 需要跨章节规划 |
-| main routed expert (L2) | 800–3000 tokens | 复杂产出/高风险 |
-| neighbor sweep | 200–800 tokens | 命中红旗后升级 |
-| heavy reference (L3) | 0 by default | 缺证据/缺模板/验收失败 |
-| route log | 100–300 tokens | 只记结构化摘要 |
-
-## 5. 反模式
-
-- **路由器比任务还贵**：为了省 token 写了复杂长 prompt，每次先烧一大段判断。
-- **全库前置**：把所有 skill/章节摘要都放 stable prefix。
-- **查漏变复读**：missed-case sweep 重新执行完整专家流程，而不是 checklist。
-- **缓存污染**：把用户私密资料放进“稳定模板”。
-- **过度结构化**：小任务也强制 ROUTING/GRAPH/CACHE 全量展开。
-
-## 6. Jason 反馈形成的 gotcha：低功耗幻觉
-
-来自 LingTai soul-flow PR #235 的教训：
-
-> “看起来低功耗”的 kernel-side 路由，如果每次都增加额外判断、日志、上下文拼接和专家选择，可能实际消耗更多 token，并且不符合系统原设计哲学。
-
-因此，本 skill 的稀疏原则必须通过验收门：
-
-- 路由成本 < 直接执行成本；
-- 查漏是 checklist，不是全量重跑；
-- heavy reference 默认为 0；
-- route log 简短结构化；
-- 若任务很小，直接执行，不启动复杂路由。
-
-## 7. 避免陷阱 gotchas
-
-这些陷阱要写入每个稀疏蒸馏 skill 的 `CACHE.md` / `ROUTING.yaml` / eval：
-
-1. **为省 token 先烧 token**  
-   陷阱：先让模型读一大段路由理论、全量 skill graph、复杂分类 prompt，再决定是否调用。  
-   避免：路由入口必须是短表：触发词、反触发、top-k 候选、红旗 checklist；复杂理论放 `reference/`，默认不读。
-
-2. **把 missed-case sweep 做成第二次全量审稿**  
-   陷阱：查漏阶段又完整运行所有邻居专家，导致“稀疏激活”失效。  
-   避免：查漏只问少数高价值问题：是否有禁忌/红旗/特殊人群/证据边界/相邻误触发；命中后才升级加载对应专家。
-
-3. **路由日志越写越长**  
-   陷阱：每次记录长推理、长引用、完整上下文，后续回流反而污染缓存。  
-   避免：route log 只留结构化短字段：`task_type`、`selected_experts`、`skipped_experts`、`red_flags`、`load_more`、`outcome`、`fix_next_time`。
-
-4. **稳定前缀被临时材料污染**  
-   陷阱：把用户私密材料、一次性搜索片段、本地路径、长 excerpt 写入 shared core。  
-   避免：stable prefix 只放长期规则；当前任务材料永远放 variable suffix；私有事实进 knowledge，不进公共 skill。
-
-5. **专家拆得太细，协调成本超过收益**  
-   陷阱：为每个小概念都做一个专家，导致 top-k 选择、邻域图维护、解释成本暴涨。  
-   避免：专家粒度按“可独立完成一个判断/产出”划分；低频细节放 reference；常用且高风险的判断才升为专家。
-
-6. **只追求命中主专家，忘了安全常驻**  
-   陷阱：top-k 很准，但医学/营养/法律等高风险任务漏掉红线。  
-   避免：shared core 永远包含版权、隐私、证据、安全边界；高风险领域即使只命中一个专家，也必须跑 safety sweep。
-
-7. **缓存友好被误解成固定一切**  
-   陷阱：为了缓存命中率，把所有章节摘要、案例和模板都塞进固定 prompt。  
-   避免：缓存友好 = 稳定规则稳定 + 变量材料后置 + 重料按需；不是“全库常驻”。
-
-8. **没有度量，就无法证明低功耗**  
-   陷阱：只在理念上说省 token，没有比较“直接执行 vs 稀疏路由”的成本与质量。  
-   避免：eval 至少包含一个预算测试：小任务应直接执行；中任务只加载主专家 + checklist；高风险任务才升级重引用。
-
-## 8. 正法：网状、交叉、点对点触发，而非遍历面式触发
-
-真正省 token 的稀疏蒸馏，不是让模型“阅读整张网再决定”，而是把网预先压成轻量索引。这里的“网”不是树状目录，也不是单线分类，而是**交叉网络**：一个任务可从多个入口命中，一个节点可连接多个邻居，红旗/证据/人群/场景可横向穿透不同专家。
-
-- 每个 skill / expert 只有很短的 `signature`：触发词、反触发、输入类型、风险标签、相邻节点；
-- 当前任务先命中一个或少数入口节点；
-- 只沿必要邻接边做 0–1 跳 missed-case sweep；
-- 交叉边只保存“何时需要互相提醒”，不保存长正文；
-- 未命中红旗时，不展开邻居正文；
-- 不把全图、全章节摘要、全专家说明塞进当前 prompt；
-- 图结构最好由文件/脚本/索引保存，LLM 只读命中的小片段。
-
-一句话：**省 token 的不是“有一张网”，而是“用网状交叉的点对点邻接关系避免面式遍历”。**
-
-若实现成“把整张 graph 用自然语言交给模型遍历”，则会更费 token；若实现成“短 signature 命中 + 局部交叉邻接查漏 + 按需加载正文”，才符合 DeepSeek/MoE 式轻 gate、重 expert 的精神。
-
-## 9. 球形 / 环形回路：回到命中的缓存
-
-网状交叉解决“如何局部命中”；球形或环形回路解决“命中后如何回到稳定缓存”。
-
-一个健康的稀疏 skill 调用不应无限外扩，而应形成闭环：
+## Mandatory sweep placement
 
 ```text
-stable shared core
-  -> short signature 命中
-  -> 局部交叉邻接查漏
-  -> 必要时加载少数 expert/reference
-  -> 输出与验收
-  -> route log / gotcha / eval 回流
-  -> 更新稳定 signature 或缓存索引
-  -> 下次更快命中
+validate request + registry/index
+  -> lexical score / anti-trigger / threshold / stable top-k
+  -> mandatory low-cost post-route baseline sweep
+  -> high-risk/ambiguous extra checks and safety module when available
+  -> exact checksummed module/chunk load plan
+  -> output + compact audit
 ```
 
-这里的“球形/环形”不是让模型绕远路，而是让每次调用后的经验**回到可缓存的命中结构**：
+The baseline sweep runs for selected, below-threshold, bypassed, and rejected statuses. It is a short checklist/indicator pass, not a second full expert execution. A high-risk/ambiguous safety module is outside semantic top-k.
 
-- 命中过的路径沉淀为更短的 signature；
-- 常见查漏结果沉淀为固定 checklist；
-- 重复使用的解释沉淀为 stable prefix 或 reference brief；
-- 不常用的长材料仍留在 heavy reference；
-- route log 只提炼“下次如何更快命中”，不保留长推理。
+## Below threshold and anti-trigger
 
-因此，球形/环形的价值在于：**让探索出去的分支回到核心缓存，让下一次调用不是重新遍历，而是复用已命中的路径。**
+- Below threshold: keep shared core; mark the route ambiguous; run extra checks and load the built safety module when available. Do not invent a semantic expert.
+- Bypass/reject anti-trigger: select no semantic expert, preserve the baseline sweep, and return only the load plan justified by safety state.
+- Malformed input: fail before a query-output record exists.
 
-若没有回环，Skill Graph 会越长越散；有回环，Skill Graph 才能越用越短、越用越准、越用越容易命中缓存。
+## Audit/log placement
 
-## 10. 一句话
+Retain only IDs, hashes, scores/hits, selected/skipped expert IDs, sweep checks/hits, exact load paths/checksums, status, and ordered event summaries. Do not retain source bodies, hidden reasoning, credentials, or private task histories. The host owns consent, access controls, retention, and deletion.
 
-> 缓存友好不是把所有东西固定住；而是让稳定规则稳定，让变化材料后置，让重料按需，让路由成本永远小于节省下来的成本；更进一步，是让每次命中后的经验回流成更短的 signature，使下一次更快回到命中的缓存。
+## Honest cost evidence
+
+`scripts/benchmark.py` reports deterministic fixture proxies only:
+
+- source and chunk character/whitespace-word counts;
+- all registered versus selected L3 character counts;
+- registered/selected experts and chunks plus ratios.
+
+These are not model tokens, monetary cost, latency, semantic recall, or answer quality. No savings claim is valid without a separately pinned model/tokenizer, representative workload, direct baseline, and quality rubric.
+
+## Common failures
+
+1. **Sparse intake instead of sparse invocation.** Never skip Phase-1 chunks.
+2. **Router larger than avoided work.** Keep signatures/index compact and measure rather than assume.
+3. **Selected path changed after build.** Check checksums and fail; never load silently.
+4. **Sweep becomes full re-execution.** Escalate to one safety module only on high-risk/ambiguity.
+5. **L3 existence becomes all-L3 loading.** Load only selected/safety L3 paths.
+6. **No-hit invents expertise.** Preserve shared core and safety, then ask for reviewed routing improvement if needed.
+7. **Logs become a private cache.** Store compact audit fields only.
+8. **Cache learns silently.** Evidence creates a human-reviewed proposal, never automatic mutation.

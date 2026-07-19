@@ -1,0 +1,62 @@
+{
+  "contract_version": "1.0.0",
+  "node_id": "semantic-distill-condition",
+  "node_kind": "condition",
+  "title": "Semantic Distillation Applicability Condition",
+  "content": "Semantic distillation applies only when: 1) a source chunk contains extractable domain knowledge (not pure boilerplate), 2) an agent/human has actually read the chunk with source locator verification, 3) the distilled record captures at least one knowledge node with valid provenance back to the chunk.",
+  "source_ref": {
+    "ref_type": "chunk",
+    "chunk_id": "chunk-9098d1d1be6b4b5effdd",
+    "source_id": "src-ce2f45ce20bb732c",
+    "start_line": 7,
+    "end_line": 10,
+    "claim": "Distillation conditions from semantic-distillation module"
+  },
+  "dependencies": [
+    {
+      "target_node_id": "coverage-definition",
+      "relation_type": "prerequisite",
+      "reason": "Must have coverage tracking before applying distillation conditions"
+    }
+  ],
+  "relations": [],
+  "triggers": [
+    {"term": "distill", "weight": 8},
+    {"term": "semantic", "weight": 6},
+    {"term": "condition", "weight": 5},
+    {"term": "applicability", "weight": 7},
+    {"term": "extract", "weight": 4}
+  ],
+  "anti_triggers": [],
+  "scope": {
+    "applicability": "distillation phase before build validation",
+    "exceptions": ["chunks with processing_status complete_no_reusable_knowledge"]
+  },
+  "validation_state": "validated",
+  "safety_red_lines": [],
+  "vectors": [
+    {
+      "channel_name": "semantic",
+      "dimension": 4,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.4, 0.8, 0.3, 0.2]
+    },
+    {
+      "channel_name": "task",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.3, 0.6, 0.4]
+    },
+    {
+      "channel_name": "risk",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.1, 0.2, 0.1]
+    }
+  ],
+  "expert_id": "semantic-distillation",
+  "routing_priority": 1
+}

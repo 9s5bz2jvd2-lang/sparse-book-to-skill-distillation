@@ -1,0 +1,28 @@
+{
+  "contract_version": "1.0.0",
+  "source_manifest_sha256": "PLACEHOLDER_MANIFEST_SHA",
+  "authored_by": {
+    "author_type": "agent",
+    "author_label": "MiMo-Phase1-fixture"
+  },
+  "entries": [
+    {
+      "chunk_id": "chunk-199c1e4f467e3bd46732",
+      "status": "atoms_authored",
+      "atom_ids": ["coverage-definition", "manifest-provenance-workflow"],
+      "reason": "Coverage ledger definition and provenance workflow extracted from sparse-reader module"
+    },
+    {
+      "chunk_id": "chunk-9098d1d1be6b4b5effdd",
+      "status": "atoms_authored",
+      "atom_ids": ["semantic-distill-condition", "sparse-activation-formula"],
+      "reason": "Distillation conditions and activation formula from semantic-distillation and sparse-reader modules"
+    },
+    {
+      "chunk_id": "chunk-142536ab10af131e3e9d",
+      "status": "atoms_authored",
+      "atom_ids": ["safety-no-partial-coverage", "counterexample-unstructured-summary", "evidence-hash-stability"],
+      "reason": "Safety rule, counterexample, and hash evidence from safety-governance L3"
+    }
+  ]
+}

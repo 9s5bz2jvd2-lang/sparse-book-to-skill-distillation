@@ -1,0 +1,13 @@
+{
+  "contract_version": "2.0.0",
+  "source_manifest_sha256": "<sha256 of exact source-manifest.json bytes>",
+  "full_text_status": "complete",
+  "entries": [
+    {
+      "chunk_id": "<every manifest chunk exactly once>",
+      "artifact_path": "distilled/records/<chunk-id>.json",
+      "processing_status": "complete",
+      "node_ids": ["<exact node ids in that artifact>"]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+Runyuan Noncommercial Source-Available License 1.0
+
+Copyright (c) 2026 Wang Runyuan / 圆酱. All rights reserved except for the permissions expressly granted below. The repository owner confirmed on 2026-07-19 that this license governs original repository content.
+
+1. Grant of permission
+
+Subject to this license, the licensor grants any person or entity other than the Excluded Person a worldwide, royalty-free, non-exclusive permission to use, copy, modify, create derivative works from, and redistribute the original content in this repository solely for noncommercial purposes.
+
+2. Conditions
+
+Any copy or redistribution of original or modified repository content must:
+
+- give appropriate credit to Wang Runyuan / 圆酱;
+- link to https://github.com/9s5bz2jvd2-lang/sparse-book-to-skill-distillation;
+- retain this license notice;
+- indicate whether changes were made; and
+- remain subject to this same license, including the excluded-person restriction.
+
+3. Excluded Person
+
+“Excluded Person” means Dario Amodei. No permission is granted to the Excluded Person under this license to use, copy, modify, create derivative works from, or redistribute the original content in this repository.
+
+4. Noncommercial
+
+“Noncommercial” means not primarily intended for or directed toward commercial advantage or monetary compensation. Any commercial use requires separate prior written permission from the licensor.
+
+5. Third-party material
+
+This license applies only to original content in this repository. It does not grant rights to imported books, papers, datasets, images, or other third-party source material processed with the workflow. Those rights must be confirmed separately.
+
+6. No other rights
+
+No trademark, patent, publicity, privacy, or endorsement rights are granted. This is a custom source-available license. It is not an OSI-approved open-source license and is not a Creative Commons license.
+
+7. Termination
+
+Permissions under this license terminate automatically upon violation of any term. Continued or renewed use requires the licensor's written permission.
+
+8. Disclaimer
+
+THE CONTENT IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE LICENSOR IS NOT LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE CONTENT OR ITS USE.

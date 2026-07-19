@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "expert-registry.v2",
+  "title": "Built sparse expert registry derived from validated artifacts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "registry_id", "build_id", "source_manifest_sha256", "distillation_sha256", "shared_core_path", "shared_core_sha256", "routing", "safety_sweep", "global_anti_triggers", "experts"],
+  "properties": {
+    "contract_version": {"const": "2.0.0"},
+    "registry_id": {"type": "string", "pattern": "^distilled-[0-9a-f]{20}$"},
+    "build_id": {"type": "string", "pattern": "^build-[0-9a-f]{20}$"},
+    "source_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "distillation_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "shared_core_path": {"type": "string", "minLength": 1},
+    "shared_core_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["match_mode", "term_frequency", "minimum_score", "default_top_k", "max_top_k", "stable_tie_break"],
+      "properties": {
+        "match_mode": {"const": "normalized_substring"},
+        "term_frequency": {"const": "at_most_once_per_term"},
+        "minimum_score": {"type": "integer", "minimum": 1},
+        "default_top_k": {"type": "integer", "minimum": 1},
+        "max_top_k": {"type": "integer", "minimum": 1},
+        "stable_tie_break": {"type": "array", "minItems": 3, "uniqueItems": true, "items": {"enum": ["score_desc", "tie_break_priority_asc", "expert_id_asc"]}}
+      }
+    },
+    "safety_sweep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mandatory", "phase", "baseline_checks", "high_risk_or_ambiguous_extra_checks", "safety_expert_ids", "risk_terms", "lexical_indicators"],
+      "properties": {
+        "mandatory": {"const": true},
+        "phase": {"const": "post_route"},
+        "baseline_checks": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "high_risk_or_ambiguous_extra_checks": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "safety_expert_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "risk_terms": {"type": "object"},
+        "lexical_indicators": {"type": "object"}
+      }
+    },
+    "global_anti_triggers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["term", "action", "reason"],
+        "properties": {
+          "term": {"type": "string", "minLength": 1},
+          "action": {"enum": ["bypass", "reject"]},
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "experts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["expert_id", "title", "tie_break_priority", "one_liners", "trigger_terms", "anti_trigger_terms", "risk_tags", "l1_modules", "l2_modules", "l3_files", "chunks"],
+        "properties": {
+          "expert_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "title": {"type": "string", "minLength": 1},
+          "tie_break_priority": {"type": "integer", "minimum": 0},
+          "one_liners": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "trigger_terms": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["term", "weight"],
+              "properties": {
+                "term": {"type": "string", "minLength": 1},
+                "weight": {"type": "integer", "minimum": 1, "maximum": 20}
+              }
+            }
+          },
+          "anti_trigger_terms": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "risk_tags": {"type": "array", "uniqueItems": true, "items": {"enum": ["medical", "nutrition", "legal", "financial", "copyright", "privacy"]}},
+          "l1_modules": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["node_id", "brief", "safety_red_lines", "uncertainties"],
+              "properties": {
+                "node_id": {"type": "string", "minLength": 1},
+                "brief": {"type": "string", "minLength": 1},
+                "safety_red_lines": {"type": "array", "items": {"type": "string"}},
+                "uncertainties": {"type": "array", "items": {"type": "string"}}
+              }
+            }
+          },
+          "l2_modules": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["node_id", "workflow", "load_more_if"],
+              "properties": {
+                "node_id": {"type": "string", "minLength": 1},
+                "workflow": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+                "load_more_if": {"type": "array", "items": {"type": "string"}}
+              }
+            }
+          },
+          "l3_files": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "sha256"],
+              "properties": {
+                "path": {"type": "string", "minLength": 1},
+                "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+              }
+            }
+          },
+          "chunks": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["chunk_id", "path", "sha256", "source_id", "source_path", "start_line", "end_line", "page_range"],
+              "properties": {
+                "chunk_id": {"type": "string", "pattern": "^chunk-[0-9a-f]{20}$"},
+                "path": {"type": "string", "minLength": 1},
+                "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                "source_id": {"type": "string", "pattern": "^src-[0-9a-f]{16}$"},
+                "source_path": {"type": "string", "minLength": 1},
+                "start_line": {"type": "integer", "minimum": 1},
+                "end_line": {"type": "integer", "minimum": 1},
+                "page_range": {"type": "array", "items": {"type": "integer", "minimum": 1}}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

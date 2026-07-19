@@ -1,0 +1,62 @@
+{
+  "contract_version": "1.0.0",
+  "node_id": "coverage-definition",
+  "node_kind": "definition",
+  "title": "Coverage Ledger Definition",
+  "content": "A coverage ledger is a manifest-derived table that records every source chunk, its processing status, and the semantic artifacts produced from it. It ensures complete and non-overlapping coverage of the source material.",
+  "source_ref": {
+    "ref_type": "chunk",
+    "chunk_id": "chunk-199c1e4f467e3bd46732",
+    "source_id": "src-ce2f45ce20bb732c",
+    "start_line": 1,
+    "end_line": 6,
+    "claim": "Coverage ledger definition from sparse-reader chunk"
+  },
+  "dependencies": [],
+  "relations": [
+    {
+      "target_node_id": "manifest-provenance-workflow",
+      "relation_type": "supports",
+      "reason": "Coverage ledger depends on manifest provenance for chunk tracking"
+    }
+  ],
+  "triggers": [
+    {"term": "coverage ledger", "weight": 10},
+    {"term": "coverage", "weight": 5},
+    {"term": "ledger", "weight": 8},
+    {"term": "inventory", "weight": 4},
+    {"term": "complete source", "weight": 3}
+  ],
+  "anti_triggers": ["just answer one fact"],
+  "scope": {
+    "applicability": "source-to-skill distillation workflows requiring full chunk coverage tracking",
+    "exceptions": []
+  },
+  "validation_state": "validated",
+  "safety_red_lines": [],
+  "vectors": [
+    {
+      "channel_name": "semantic",
+      "dimension": 4,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.9, 0.3, 0.1, 0.0]
+    },
+    {
+      "channel_name": "task",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.8, 0.2, 0.1]
+    },
+    {
+      "channel_name": "risk",
+      "dimension": 3,
+      "model_id": "synthetic_fixture",
+      "model_version": "1.0.0",
+      "values": [0.1, 0.0, 0.0]
+    }
+  ],
+  "expert_id": "coverage-ledger",
+  "routing_priority": 0
+}

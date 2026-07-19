@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atomic-node.v1",
+  "title": "Fine-grained atomic knowledge node with provenance, dependencies, and typed relations",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "node_id",
+    "node_kind",
+    "title",
+    "content",
+    "source_ref",
+    "dependencies",
+    "relations",
+    "triggers",
+    "anti_triggers",
+    "scope",
+    "validation_state",
+    "safety_red_lines",
+    "expert_id",
+    "routing_priority"
+  ],
+  "properties": {
+    "contract_version": {"const": "1.0.0"},
+    "node_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "node_kind": {
+      "enum": [
+        "definition",
+        "formula",
+        "condition",
+        "counterexample",
+        "workflow_step",
+        "evidence",
+        "red_line"
+      ]
+    },
+    "title": {"type": "string", "minLength": 1},
+    "content": {"type": "string", "minLength": 1},
+    "source_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref_type"],
+      "properties": {
+        "ref_type": {"enum": ["chunk", "synthetic_fixture"]},
+        "chunk_id": {"type": "string"},
+        "source_id": {"type": "string"},
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "claim": {"type": "string"},
+        "fixture_label": {"type": "string"}
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target_node_id", "relation_type", "reason"],
+        "properties": {
+          "target_node_id": {"type": "string"},
+          "relation_type": {
+            "enum": [
+              "prerequisite",
+              "supports",
+              "contradicts",
+              "refines",
+              "safety_requires",
+              "provenance_chain"
+            ]
+          },
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target_node_id", "relation_type", "reason"],
+        "properties": {
+          "target_node_id": {"type": "string"},
+          "relation_type": {
+            "enum": [
+              "prerequisite",
+              "supports",
+              "contradicts",
+              "refines",
+              "safety_requires",
+              "provenance_chain"
+            ]
+          },
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "triggers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["term", "weight"],
+        "properties": {
+          "term": {"type": "string", "minLength": 1},
+          "weight": {"type": "integer", "minimum": 1, "maximum": 20}
+        }
+      }
+    },
+    "anti_triggers": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applicability"],
+      "properties": {
+        "applicability": {"type": "string", "minLength": 1},
+        "exceptions": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "validation_state": {
+      "enum": ["validated", "provisional", "disputed", "deprecated"]
+    },
+    "safety_red_lines": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "global_invariant": {
+      "type": "boolean",
+      "description": "Optional; red_line nodes only. Declares a documented global invariant that every route must include. Use sparingly: global red lines cost sparsity on every query."
+    },
+    "risk_domains": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "description": "Optional; red_line nodes only. Risk domains that route this red line in when a query declares them."
+    },
+    "vectors": {
+      "type": "array",
+      "description": "Optional named multi-dimensional vectors for vector-addressed routing",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["channel_name", "dimension", "model_id", "model_version", "values"],
+        "properties": {
+          "channel_name": {"type": "string", "minLength": 1},
+          "dimension": {"type": "integer", "minimum": 1},
+          "model_id": {"type": "string", "minLength": 1},
+          "model_version": {"type": "string", "minLength": 1},
+          "values": {"type": "array", "items": {"type": "number"}, "minItems": 1}
+        }
+      }
+    },
+    "expert_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "routing_priority": {"type": "integer", "minimum": 0}
+  }
+}
