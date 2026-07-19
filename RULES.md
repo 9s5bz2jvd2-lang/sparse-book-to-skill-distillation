@@ -2,7 +2,7 @@
 
 ## 1. Ownership and account discipline
 
-This repository belongs to `9s5bz2jvd2-lang` / 圆酱. Do not represent or publish it as a Huang Zesen personal project, an official LingTai organization project, or a nutrition-only asset. Transfer or publication requires owner authorization.
+This repository belongs to **王润圆 / Wang Runyuan**. Do not represent or publish it as a Huang Zesen personal project, an official LingTai organization project, or a nutrition-only asset. Transfer or publication requires owner authorization.
 
 ## 2. Reuse boundary — custom noncommercial source-available license
 

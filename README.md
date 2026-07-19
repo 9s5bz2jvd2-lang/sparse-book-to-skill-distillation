@@ -231,7 +231,7 @@ The included benchmark reports only character counts, whitespace-split words, se
 
 ## Ownership
 
-This repository belongs to `9s5bz2jvd2-lang` / 圆酱. It is not a Huang Zesen personal repository, an official LingTai organization repository, or a nutrition-only asset. See `RULES.md`.
+This repository belongs to **王润圆 / Wang Runyuan**. It is not a Huang Zesen personal repository, an official LingTai organization repository, or a nutrition-only asset. See `RULES.md`.
 
 ## License / reuse — custom noncommercial source-available license
 
