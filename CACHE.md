@@ -62,6 +62,37 @@ Retain only IDs, hashes, scores/hits, selected/skipped expert IDs, sweep checks/
 
 These are not model tokens, monetary cost, latency, semantic recall, or answer quality. No savings claim is valid without a separately pinned model/tokenizer, representative workload, direct baseline, and quality rubric.
 
+## Low-power gate — routing cost must stay below saved cost
+
+This is a **caller/evaluation acceptance rule**, not a runtime guarantee: the current router does not automatically decide that a task is “small” or prove token/cost savings. `scripts/benchmark.py` exposes structural proxies only; a real savings claim needs a pinned external comparison.
+
+“看起来低功耗”的路由若每次都增加额外判断、日志、上下文拼接和专家选择，可能实际消耗更多 token。低功耗是验收门，不是口号：
+
+- **routing overhead < cost it saves.** If the signature/index/closure work costs more than the reading it avoids, the design has failed its own gate; measure with `scripts/benchmark.py` proxies plus an external pinned-model comparison before claiming savings.
+- **direct execution for small tasks.** A task small enough to answer from the shared core alone is executed directly; do not wake the graph router, closure, or residual machinery for it.
+- the sweep is a checklist, never a second full expert run;
+- heavy L3/reference load defaults to zero and rises only on selection, safety, or acceptance failure;
+- audit records stay compact and structured, never long reasoning transcripts.
+
+## Network and ring — point-to-point hits that return to cache
+
+The token saving does not come from “having a graph”; it comes from **point-to-point cross-linked activation instead of surface traversal**（网状交叉点对点触发，而非遍历面式触发）. Signatures stay short; the graph lives in files and indexes; the model reads only the hit fragments. Handing the whole graph to a model to walk in natural language would cost more than it saves.
+
+The ring closes the loop back to the cache（球形/环形回路：回到命中的缓存）:
+
+```text
+stable shared core
+  -> short signature hit
+  -> local cross-linked missed-case sweep
+  -> bounded closure loads few experts/references
+  -> output + acceptance
+  -> compact route/gotcha/eval evidence returns
+  -> (human-gated) shorter signature / better index
+  -> faster cache hit next call
+```
+
+The executable inner part of this ring is the residual bank: `scripts/graph_query.py` appends the exact final selected state so a later supported query revisits it cheaply. The outer part — actually shortening signatures and indexes — is the human-gated proposal loop in `docs/self-evolution-loop.md`. Without the return leg, a Skill graph grows longer and more scattered with use; with it, the graph gets shorter, more precise, and easier to hit in cache.
+
 ## Common failures
 
 1. **Sparse intake instead of sparse invocation.** Never skip Phase-1 chunks.

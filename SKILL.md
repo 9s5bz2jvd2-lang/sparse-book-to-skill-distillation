@@ -3,7 +3,7 @@ name: 稀疏蒸馏 | Book-to-Skill Sparse Distillation
 description: |
   Use when authorized books/materials need one complete provenance-gated distillation followed by repeated atomic graph/vector sparse reading. Scripts import, hash, chunk, queue, validate, build, and query; a reviewer reads every chunk and authors L0-L3 plus atoms. Each query returns exact load files, one bounded dependency/safety closure, append-only residual state, and an audit trace. Skip ordinary summaries, copyright evasion, private-data publication, and unmeasured quality claims.
 version: 3.0.0
-last_changed_at: "2026-07-19T00:34:10-07:00"
+last_changed_at: "2026-07-19T02:20:37-07:00"
 tags: [skill-authoring, book-distillation, sparse-reading, provenance, safety, audit]
 ---
 
@@ -22,6 +22,18 @@ This Skill has two separate phases. A hand-written expert registry without a com
 - **不以稀疏损害完整性**：稀疏的是每次调用，不是知识建库、证据、审计或安全扫描。若最小子集不足，应明确扩取、降级或交还人工判断，不得假装已覆盖全部知识。
 
 这与模型层“总容量大、单次激活少”的稀疏专家思想在哲学上同构，但本 Skill 是**知识与工作流层**的实现，不是模型权重 MoE，也不因任何后来出现的外部模型而获得来源、正确性、速度、token 节省或答案质量证明。外部系统只能作为后来的技术镜照，不能改写本设计的来源。
+
+## 设计核心 — 网 → 环 → 球
+
+> **网给 skill 以通达，环给 skill 以低功耗；分支出去，回流成丹。**
+
+- **网（network，通达）**：shared core、routed experts 与原子节点由依赖/来源边交叉连接成图，多维向量（semantic/task/risk 通道）强化网络坐标，让任务点对点命中节点，而不是面式遍历全库。可执行落点：`build/graph-registry.v1.json` 的交叉边与 `build/vector-index.v1.json` 的多通道坐标。
+- **环（ring，低功耗回环）**：每次调用走一条短闭环——短 signature 命中 → 一次有界依赖/来源/安全闭包 → 只加载载入清单 → 输出 → 选中状态回流 residual bank，供后续相关查询低成本重访。**路由成本必须小于其节省的成本**；任务很小就直接执行，不启动路由。后一句是调用者/评测验收规则，并非当前代码会自动判定“小任务”或证明 token 节省。可执行落点：`scripts/graph_query.py` 的一次闭包与 append-only residual bank。
+- **球（sphere，验收态）**：分支出去不算完成，直到它**回流成压缩的可复用结构**——更短的 signature、固定 checklist、gotcha、eval、reference brief。回流的是紧凑的 audit/route/gotcha/eval 信息，不是原文复制。内环（residual bank 状态保存/重访）已可执行；外环（signature/cache/index 的真正改进）是人工门控协议，不是自动学习。
+
+承载三者的结构不变式：
+
+> **shared-core + cross-linked top-k routed experts + missed-case sweep + budgeted references + cache-friendly layout + cyclic return-to-cache feedback loop**
 
 ## Route here when
 

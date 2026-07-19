@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased — network→ring→sphere conceptual-core restoration
+
+### Restored
+
+- restored the original low-power design core as the repository's leading contract: 网 (cross-linked network gives reachability) → 环 (low-power return ring) → 球 (acceptance state where branches return as compressed reusable structure), including the motto 「网给 skill 以通达，环给 skill 以低功耗；分支出去，回流成丹」 and the structural invariant `shared-core + cross-linked top-k routed experts + missed-case sweep + budgeted references + cache-friendly layout + cyclic return-to-cache feedback loop`;
+- restored the low-power acceptance gate (routing overhead must stay below the cost it saves; small tasks execute directly), the point-to-point-versus-traversal network principle, and the ring's return-to-cache leg in `CACHE.md`;
+- restored the ring/sphere return-discipline mapping and the bounded micro-task-model analogy in `GRAPH.md`, and the return-loop product rule in `RULES.md`;
+- integrated the restored core with the current executable system: the graph registry/vector index realize the network, the bounded closure plus append-only residual bank realize the executable inner ring, and `docs/self-evolution-loop.md` is explicitly the human-gated outer ring.
+
+### Added
+
+- `scripts/check_concept_continuity.py`, a phrase/binding conceptual-continuity regression gate wired into `scripts/validate.py`: repository validation now fails if the network/ring/sphere core, low-power anchors, return-to-cache invariant, implemented-versus-protocol-only status boundary, or named executable inner-ring bindings are removed; semantic non-contradiction still requires review;
+- `docs/implementation-guide.md`, carrying the dense CLI/workspace/test inventory moved out of `README.md` so the README stays conclusion-first (no command or test was removed).
+
+### Unchanged
+
+- all contracts, schemas, lifecycle/graph/readiness behavior, safety boundaries, ownership, and the custom license text are unchanged; this is a documentation-and-gate restoration, not a contract change. Automatic self-modifying signatures/cache remain not implemented; outer improvement remains human-gated.
+
 ## 3.0.0 — atomic graph/vector Phase-1 upgrade (2026-07-19)
 
 ### Added

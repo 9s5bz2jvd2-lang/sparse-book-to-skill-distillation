@@ -27,6 +27,21 @@ all declared local sources
 
 A router over a hand-authored expert registry, sampled source ingestion, pending chunks, ungrounded records, or missing L3 is not completion. Sparse behavior begins only after validation/build.
 
+**Network → ring → sphere is part of the product, not decoration.** This repository must preserve the sparse-distillation loop:
+
+```text
+shared core
+  -> lightweight routing signature (网: cross-linked point-to-point hit)
+  -> cross-linked local missed-case sweep
+  -> selected experts / atoms / references (bounded closure)
+  -> validation + output
+  -> route-log / gotcha / eval evidence returns (环: residual bank inner loop;
+     signature/index improvement only via the human-gated outer loop)
+  -> better cache hit next time
+```
+
+**Branching is incomplete until it returns as compressed reusable structure**（分支出去，回流成丹）. Routing overhead must stay below the cost it saves; callers execute small tasks directly rather than invoking the router. This is a caller/evaluation gate, not automatic runtime classification. Removing the required core, low-power, status, or executable-binding anchors fails `scripts/check_concept_continuity.py`; detecting semantic contradiction still requires review.
+
 **Capacity and activation are separate.** This original design principle belongs to Wang Runyuan / 圆酱: preserve the complete authorized, reviewed, provenance-bound knowledge capacity during distillation; activate only the smallest sufficient shared-core/L3/source-chunk subset for each later task. Sparsity may reduce per-invocation loading, but must never erase build completeness, provenance, auditability, or the mandatory safety sweep. Model-level sparse expert systems may be cited only as later analogies—not as the source of this Skill, proof that it implements model-weight MoE, or evidence of speed, token, cost, or quality gains.
 
 ## 4. Honest automation boundary

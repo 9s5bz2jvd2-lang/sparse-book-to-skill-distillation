@@ -7,6 +7,7 @@ import json
 import sys
 from pathlib import Path
 
+from check_concept_continuity import main as check_concept_continuity
 from check_doc_paths import main as check_doc_paths, markdown_files
 from contract_validation import CONTRACT_VERSION, ContractError, load_json, validate_instance
 from pipeline import ROOT
@@ -137,6 +138,10 @@ def main() -> int:
             print(f"FAIL validation: {exc}", file=sys.stderr)
         return 1
 
+    concept_exit = check_concept_continuity()
+    if concept_exit:
+        print("FAIL conceptual-continuity gate", file=sys.stderr)
+        return 1
     test_exit = run_lifecycle_tests()
     if test_exit:
         print("FAIL lifecycle regression suite", file=sys.stderr)

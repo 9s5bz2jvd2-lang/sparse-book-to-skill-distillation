@@ -81,6 +81,37 @@ These are optional workflows, not runtime dependencies. Do not fetch or execute 
 
 This package is not a summary service, source/copyright bypass, private-fact store, model-weight MoE, embedding/semantic search system, generated-code executor, or autonomous self-modifier. Its router is deterministic lexical indexing over agent-authored semantic artifacts.
 
+## Ring and sphere — the return discipline
+
+网给 skill 以通达，环给 skill 以低功耗；分支出去，回流成丹。 The graph above supplies reachability (网). The ring (环) is the low-power closed loop each query travels; the sphere (球) is the acceptance state: **a branch is incomplete until it returns as compressed reusable structure.**
+
+| Cyclic-return language | This system's realization | Status |
+|---|---|---|
+| outward trajectory | one query, one expert/atom expansion, one sweep branch | executable |
+| coarse-graining | compressing the excursion into signature/checklist/gotcha/eval/reference-brief updates | human-gated protocol |
+| durable center | shared core, contracts, routing policy, `CACHE.md`, `GRAPH.md` | executable artifacts |
+| return map | residual bank appends exact selected state; audit evidence feeds a reviewed proposal | inner loop executable; outer loop human-gated |
+| continuity invariant | purpose, red lines, and output contract do not drift per call | mechanically guarded by contracts/tests; semantic continuity still requires review |
+| low-power intuition | next call re-reads less: revisit supported residual nodes, hit shorter signatures | residual revisit executable; signature shortening human-gated |
+
+At the end of every nontrivial call, ask: which hit could become a shorter signature; which sweep exposed a new cross edge; which explanation should sink to a brief; which gotcha/eval must be added; which detail is noise to prune. Those answers become proposal material, never silent edits.
+
+## The Skill as a micro task model — analogy and its boundary
+
+A Skill carrying judgments, triggers, workflows, atoms, scripts, and references can be read as an **externalized, editable, micro task model**:
+
+| Model concept | This Skill's counterpart |
+|---|---|
+| parameter memory | validated records, L3 views, atoms, shared core |
+| input interface | triggers, anti-triggers, query contract |
+| gate | lexical/vector routing signatures and graph edges |
+| expert | routed expert / atomic node working set |
+| shared layers | shared core: copyright, privacy, safety, evidence lines |
+| eval | lifecycle/graph/readiness suites and eval cases |
+| continual learning | route evidence → human-reviewed proposal → merge |
+
+The boundary stays hard: it is not a neural model, does not generalize, and never trains itself. It stays callable like a micro model only through short entries, a light gate, on-demand heavy material, and reviewed feedback — otherwise it degrades into a pile of long documents.
+
 ## Feedback edge
 
 ```text

@@ -1,6 +1,11 @@
-# Human-gated Skill evolution
+# Human-gated Skill evolution — the outer ring
 
-A static Skill cannot observe, judge, or rewrite itself. Contract `2.0.0` therefore allows query evidence to motivate a separate reviewed proposal only:
+This document is the **outer half** of the ring in the network→ring→sphere design (`README.md`). The ring has two loops with one purpose — branches must return as compressed reusable structure（分支出去，回流成丹）:
+
+- **Inner loop (executable today):** `scripts/graph_query.py` appends each query's exact final selected state to the append-only residual bank, and a later query may revisit those prior-only nodes when the current query itself supports them. This is workflow state preservation, not learning: it never edits signatures, records, policy, graph, cache, or tests.
+- **Outer loop (this protocol, human-gated):** compact audit/route/gotcha/eval evidence — never raw corpus duplication — motivates a reviewed proposal that, after tests and an explicit merge, shortens future signatures, tightens indexes, and improves sweeps. This is where the Skill actually gets better with use, and it is deliberately not automatic.
+
+A static Skill cannot observe, judge, or rewrite itself, and this repository implements no self-modifying signatures or cache. Contract `2.0.0` therefore allows query evidence to motivate a separate reviewed proposal only:
 
 ```text
 validated registry/index + contract-valid query

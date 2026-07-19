@@ -1,6 +1,15 @@
 # Compatibility locator only; JSON artifacts/contracts are normative.
 skill_version: "3.0.0"
 contract_version: "2.0.0"
+
+# Design core (conceptual guidance, not a runtime field contract):
+# 网给 skill 以通达，环给 skill 以低功耗；分支出去，回流成丹。
+design_core:
+  network: "cross-linked shared-core/expert/atom graph + multidimensional vectors give point-to-point reachability"
+  ring: "short signature hit -> one bounded closure -> exact load -> residual-bank return; routing cost must stay below saved cost; small tasks execute directly"
+  sphere: "a branch is complete only when it returns as compressed reusable structure (signature/checklist/gotcha/eval)"
+  activation_model: "shared-core + cross-linked top-k routed experts + missed-case sweep + budgeted references + cache-friendly layout + cyclic return-to-cache feedback loop"
+  status_boundary: "residual bank inner return loop is executable; signature/cache self-modification is not implemented; outer improvement is human-gated (docs/self-evolution-loop.md); the routing-cost/direct-execution gate is caller/evaluation protocol, not automatic runtime enforcement"
 phase_1_full_distillation:
   source_manifest_schema: contracts/source-manifest.v2.schema.json
   work_queue_schema: contracts/work-queue.v2.schema.json
