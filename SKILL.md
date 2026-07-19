@@ -87,7 +87,7 @@ For every queue item, in order:
 9. add claim-level chunk/source/line provenance and justified global bypass/reject anti-triggers;
 10. replace the shared-core placeholder.
 
-Use `assets/distilled-chunk-template.json` and read `reference/full-distillation-workflow.md`. For long material, claim/resume the next contiguous slice with `python3 scripts/review_queue.py next --workspace <workspace> --batch-size 20`, then checkpoint only after all active records are authored with `python3 scripts/review_queue.py checkpoint --workspace <workspace>`. Repeating `next` after interruption returns the same batch; out-of-order or false completion fails. Leave unfinished items pending; sampling while claiming full completion is not.
+Use `assets/distilled-chunk-template.json` and read `reference/full-distillation-workflow.md`. For long material, claim/resume the next contiguous slice with `python3 scripts/review_queue.py next --workspace <workspace> --batch-size 3` (default 3), then commit progress with `python3 scripts/review_queue.py checkpoint --workspace <workspace>`. Checkpoint commits the longest valid contiguous authored prefix of the active slice: the first pending record ends the prefix, an invalid non-pending prefix record hard-fails without state change, and the authored remainder past a pending gap stays active for a later checkpoint. That checkpoint validates structure, identity, hash, provenance, and required content shape only — it is not semantic truth; source/semantic acceptance remains the separate review gate. Repeating `next` after interruption returns the same batch; out-of-order or false completion fails. Leave unfinished items pending; sampling while claiming full completion is not.
 
 After all chunks, author `distilled/semantic-review.json` from `assets/semantic-review-template.json`. It must bind the manifest, list every chunk in queue order, affirm source grounding/faithfulness/uncertainty/routing/L3 review, state limitations, and acknowledge that semantic quality was not automated. The validator checks this declaration's structure and coverage, not whether the reviewer understood the source.
 
@@ -174,6 +174,8 @@ Multi-stage routing pipeline:
 5. **Residual revisit:** current-query-supported reselection of prior-only bank nodes, with unsupported siblings excluded;
 6. **One dependency/provenance/safety closure:** candidate and scoped safety seeds enter the same bounded transitive closure; a required node that cannot fit fails closed instead of being appended afterward;
 7. **Final load plan:** exact checksummed atomic node files, L3 depth views, source chunks, selected/rejected state, and the final append-only residual entry.
+
+Queries are normalized once (Unicode NFKC, casefold, whitespace collapse) into one ordered `normalized_query`; all multi-word trigger/anti-trigger phrase matching uses that ordered text. `intent_tokens` stay deterministically unique/sorted for token-level scoring and output only and are never rejoined as phrase text. Declared `risk_domains` do not wake experts lexically; their safety nodes are injected through scoped safety into the same bounded closure.
 
 Output includes `load_plan`, exact `selected_nodes`/`rejected_nodes`, atom paths/hashes and origins, the next append-only `residual` bank, and full `audit_log`. Query vectors are optional. The bundled vectors are deterministic synthetic interface fixtures, not learned embeddings or evidence of semantic quality; a future backend must match the declared channel/dimension/model metadata or fail closed.
 

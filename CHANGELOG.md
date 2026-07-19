@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — checkpoint-prefix and graph lexical/risk-domain repair
+
+### Fixed
+
+- `checkpoint_review_batch` now commits the longest valid contiguous authored prefix of the active slice: a pending head commits nothing, an invalid non-pending prefix record hard-fails with review-state bytes unchanged, authored records past a pending gap stay active for a later checkpoint, and a fully authored slice still commits whole. Prefix validation covers structure/identity/hash/provenance/content shape only, never semantic truth;
+- default semantic-review batch size changed from 20 to 3 for new workspaces/states/CLI; the stored batch size may change only between batches (an active slice is never resized) and old workspaces with a stored 20 remain loadable and drainable;
+- graph query normalization now applies Unicode NFKC before casefold/whitespace collapse and preserves one ordered `normalized_query`; Stage 1/Stage 2 and vector-rerank multi-word trigger/anti-trigger phrase matching use that ordered text instead of rejoined sorted `intent_tokens` (which remain token-level scoring/output only);
+- a nonempty request `risk_domains` no longer wakes every expert containing a red-line node in Stage 1; risk-domain safety nodes enter through the existing scoped safety seeds and the same bounded dependency/provenance/safety closure, preserving fail-closed behavior and audit traces.
+
 ## Unreleased — network→ring→sphere conceptual-core restoration
 
 ### Restored

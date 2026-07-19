@@ -17,8 +17,8 @@ def main(argv: list[str] | None = None) -> int:
     subparsers = parser.add_subparsers(dest="command", required=True)
     next_parser = subparsers.add_parser("next", help="return active batch or claim the next contiguous batch")
     next_parser.add_argument("--workspace", required=True, type=Path)
-    next_parser.add_argument("--batch-size", type=int, default=20)
-    checkpoint_parser = subparsers.add_parser("checkpoint", help="advance after every active artifact is authored")
+    next_parser.add_argument("--batch-size", type=int, default=3)
+    checkpoint_parser = subparsers.add_parser("checkpoint", help="commit the longest valid authored contiguous prefix of the active batch")
     checkpoint_parser.add_argument("--workspace", required=True, type=Path)
     args = parser.parse_args(argv)
     try:

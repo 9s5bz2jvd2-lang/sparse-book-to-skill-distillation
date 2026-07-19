@@ -34,7 +34,7 @@ Do not mark completion for an inaccessible, unsupported, unreadable, silently sk
 8. Save every referenced L3 path before considering the record complete.
 9. Leave queue/source-map status derivation to the finalizer; do not hand-edit status to hide incomplete files.
 
-Repeat until every queue item is reviewed. Use `scripts/review_queue.py next --workspace <workspace> --batch-size <n>` to claim/resume a manifest-bound contiguous batch and `scripts/review_queue.py checkpoint --workspace <workspace>` only after every active record is authored. An interrupted `next` returns the same batch. A pending active record, a non-pending future record, a non-prefix completed list, or a false completion flag is rejected. Sampling “representative” chunks while claiming full distillation is not allowed.
+Repeat until every queue item is reviewed. Use `scripts/review_queue.py next --workspace <workspace> --batch-size <n>` (default 3; changeable only between batches) to claim/resume a manifest-bound contiguous batch and `scripts/review_queue.py checkpoint --workspace <workspace>` to commit the longest valid contiguous authored prefix of the active slice. An interrupted `next` returns the same batch. A pending head commits nothing; an invalid non-pending prefix record hard-fails with state unchanged; a non-pending future record outside the active slice, a non-prefix completed list, or a false completion flag is rejected. Prefix validation is structural/identity/provenance only, not semantic acceptance. Sampling “representative” chunks while claiming full distillation is not allowed.
 
 ## Shared core
 

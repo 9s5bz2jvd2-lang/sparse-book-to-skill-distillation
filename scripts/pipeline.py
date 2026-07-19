@@ -459,7 +459,7 @@ def prepare_distillation(workspace: Path) -> dict[str, int]:
             "contract_version": CONTRACT_VERSION,
             "source_manifest_sha256": queue["source_manifest_sha256"],
             "queue_plan_sha256": _queue_plan_sha256(queue),
-            "batch_size": 20,
+            "batch_size": 3,
             "completed_chunk_ids": [],
             "active_batch_id": "",
             "active_chunk_ids": [],
@@ -531,17 +531,20 @@ def _review_context(workspace: Path) -> tuple[Path, dict[str, Any], dict[str, An
     return workspace, manifest, queue, state
 
 
-def claim_review_batch(workspace: Path, *, batch_size: int = 20) -> dict[str, Any]:
+def claim_review_batch(workspace: Path, *, batch_size: int = 3) -> dict[str, Any]:
     """Return the durable active batch, or atomically claim the next queue slice.
 
     Repeating this call after interruption returns the same batch. It never moves
-    the cursor; only checkpoint_review_batch can advance an active slice.
+    the cursor; only checkpoint_review_batch can advance an active slice. The
+    stored batch size may change only between batches (empty active slice); an
+    active slice is never resized, so old workspaces with a stored size of 20
+    stay loadable and drain through repeated prefix checkpoints.
     """
 
     if not 1 <= batch_size <= 1000:
         raise PipelineError("invalid_batch_size", "batch_size must be between 1 and 1000")
     workspace, manifest, queue, state = _review_context(workspace)
-    if not state["completed_chunk_ids"] and not state["active_chunk_ids"]:
+    if not state["active_chunk_ids"]:
         state["batch_size"] = batch_size
     if not state["active_chunk_ids"] and not state["all_chunks_checkpointed"]:
         start = len(state["completed_chunk_ids"])
@@ -574,7 +577,15 @@ def claim_review_batch(workspace: Path, *, batch_size: int = 20) -> dict[str, An
 
 
 def checkpoint_review_batch(workspace: Path) -> dict[str, Any]:
-    """Advance only when every record in the active contiguous batch is authored."""
+    """Commit the longest valid contiguous authored prefix of the active batch.
+
+    Scanning starts at active_chunk_ids[0]. The first pending record ends the
+    committable prefix; records past it are not inspected for commit. Any
+    non-pending prefix record must pass every identity/hash/provenance/content
+    check or the whole call hard-fails with review-state bytes unchanged. This
+    validates structure, identity, hash, provenance, and required content shape
+    only; source/semantic acceptance remains a separate review gate.
+    """
 
     workspace, manifest, queue, state = _review_context(workspace)
     if not state["active_chunk_ids"]:
@@ -583,14 +594,15 @@ def checkpoint_review_batch(workspace: Path) -> dict[str, Any]:
         raise PipelineError("no_active_review_batch", "claim a review batch before checkpointing")
     chunks = {chunk["chunk_id"]: chunk for chunk in manifest["chunks"]}
     items = {item["chunk_id"]: item for item in queue["items"]}
+    prefix: list[str] = []
     for chunk_id in state["active_chunk_ids"]:
         record = load_json(workspace_path(workspace, items[chunk_id]["artifact_path"]))
         validate_instance(record, _schema("distilled-chunk.v2.schema.json"))
+        if record["processing_status"] == "pending":
+            break
         chunk = chunks[chunk_id]
         if record["chunk_id"] != chunk_id or record["chunk_sha256"] != chunk["sha256"]:
             raise PipelineError("chunk_artifact_mismatch", f"active artifact identity/hash differs: {chunk_id}")
-        if record["processing_status"] == "pending":
-            raise PipelineError("incomplete_review_batch", f"active artifact remains pending: {chunk_id}")
         provenance = record["chunk_provenance"]
         if (
             provenance["source_id"] != chunk["source_id"]
@@ -603,13 +615,16 @@ def checkpoint_review_batch(workspace: Path) -> dict[str, Any]:
             raise PipelineError("incomplete_review_batch", f"complete active artifact lacks semantic content: {chunk_id}")
         if record["processing_status"] == "complete_no_reusable_knowledge" and (record["knowledge_nodes"] or not record["no_reusable_reason"].strip()):
             raise PipelineError("incomplete_review_batch", f"no-reusable active artifact lacks a reviewed reason: {chunk_id}")
-    count = len(state["active_chunk_ids"])
-    state["completed_chunk_ids"].extend(state["active_chunk_ids"])
-    state["active_chunk_ids"] = []
-    state["active_batch_id"] = ""
-    state["all_chunks_checkpointed"] = len(state["completed_chunk_ids"]) == len(queue["items"])
+        prefix.append(chunk_id)
+    if not prefix:
+        raise PipelineError("incomplete_review_batch", f"no authored contiguous prefix to checkpoint: {state['active_chunk_ids'][0]} remains pending")
+    remainder = state["active_chunk_ids"][len(prefix):]
+    state["completed_chunk_ids"].extend(prefix)
+    state["active_chunk_ids"] = remainder
+    state["active_batch_id"] = _expected_batch_id(remainder, len(state["completed_chunk_ids"])) if remainder else ""
+    state["all_chunks_checkpointed"] = len(state["completed_chunk_ids"]) == len(queue["items"]) and not remainder
     write_json(workspace / "review-state.json", state)
-    return {"checkpointed": count, "completed_chunks": len(state["completed_chunk_ids"]), "total_chunks": len(queue["items"]), "all_chunks_checkpointed": state["all_chunks_checkpointed"]}
+    return {"checkpointed": len(prefix), "completed_chunks": len(state["completed_chunk_ids"]), "total_chunks": len(queue["items"]), "all_chunks_checkpointed": state["all_chunks_checkpointed"]}
 
 
 def finalize_queue_and_source_map(workspace: Path) -> None:

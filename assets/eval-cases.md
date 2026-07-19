@@ -14,7 +14,7 @@ Real-material operational readiness has a separate executable suite:
 python3 scripts/run_readiness_tests.py
 ```
 
-Its three cases cover: 300 generated chunks in interruption-safe 17-item contiguous batches with pending/forged/out-of-order failures; mandatory semantic-review criteria; and external query-gold success plus deliberate route/source-load mismatch reporting. This is generated structural evidence only. It does not establish real-book meaning, gold quality, or answer quality.
+Its four cases cover: 300 generated chunks in interruption-safe 17-item contiguous batches with pending/forged/out-of-order failures; longest-valid-contiguous-prefix checkpointing with invalid-prefix hard failure, injected write-fault recovery, the default batch size of 3, and stored-batch-size-20 compatibility; mandatory semantic-review criteria; and external query-gold success plus deliberate route/source-load mismatch reporting. This is generated structural evidence only. It does not establish real-book meaning, gold quality, or answer quality.
 
 ## Covered lifecycle cases
 

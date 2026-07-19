@@ -30,17 +30,17 @@ PDF remains opt-in through `--allow-pdftotext`; extraction fidelity still needs 
 ```bash
 python3 scripts/review_queue.py next \
   --workspace /private/local/trial-workspace \
-  --batch-size 20
+  --batch-size 3
 ```
 
-Read every returned `chunk_path` completely and author its `artifact_path` plus any L3 file. Repeating `next` after interruption returns the same active batch. It does not advance. When every active record is non-pending and identity/provenance checks pass:
+Read every returned `chunk_path` completely and author its `artifact_path` plus any L3 file. Repeating `next` after interruption returns the same active batch. It does not advance. To commit the longest valid contiguous authored prefix of the active slice:
 
 ```bash
 python3 scripts/review_queue.py checkpoint \
   --workspace /private/local/trial-workspace
 ```
 
-Then call `next` again. The state contract permits only an ordered completed prefix followed by one contiguous active slice. A completed record outside that slice fails with `out_of_order_review`; a pending active record fails with `incomplete_review_batch`; tampered plan/progress fails with `review_state_mismatch`. Finalization may fast-forward only after it has inspected every queue record, which supports a complete external authored bundle without allowing a skipped chunk or a false completion flag.
+Then call `next` again. The state contract permits only an ordered completed prefix followed by one contiguous active slice. Checkpoint scans the active slice in order: the first pending record ends the committable prefix (a pending head fails with `incomplete_review_batch` and commits nothing), an invalid non-pending prefix record hard-fails with state unchanged, and authored records past a pending gap remain active for a later checkpoint. Prefix checks cover structure, identity, hash, provenance, and required content shape only — not semantic truth. A completed record outside the active slice fails with `out_of_order_review`; tampered plan/progress fails with `review_state_mismatch`. Finalization may fast-forward only after it has inspected every queue record, which supports a complete external authored bundle without allowing a skipped chunk or a false completion flag.
 
 Generated scale tests exercise this mechanism with redistributable synthetic text only. They are not semantic evidence.
 

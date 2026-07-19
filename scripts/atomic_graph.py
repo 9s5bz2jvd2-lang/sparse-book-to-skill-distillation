@@ -12,6 +12,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import unicodedata
 from pathlib import Path
 from typing import Any
 
@@ -45,7 +46,7 @@ def _schema(name: str) -> dict[str, Any]:
 
 
 def _normalize(text: str) -> str:
-    return " ".join(text.casefold().split())
+    return " ".join(unicodedata.normalize("NFKC", text).casefold().split())
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -269,10 +270,15 @@ def _extract_intent_tokens(query: str) -> list[str]:
 
 def _stage1_domain_route(
     nodes: list[dict[str, Any]],
-    intent_tokens: list[str],
-    explicit_risk_domains: list[str],
+    normalized_query: str,
 ) -> tuple[dict[str, float], list[str]]:
-    """Stage 1: coarse domain/module routing based on expert_id clustering."""
+    """Stage 1: coarse domain/module routing based on expert_id clustering.
+
+    Trigger and anti-trigger phrases match against the ordered normalized query,
+    never against rejoined sorted tokens. Risk-domain declarations do not wake
+    experts here; risk-domain safety nodes enter through scoped safety seeds in
+    the single bounded closure.
+    """
     domain_experts: dict[str, list[dict[str, Any]]] = {}
     for node in nodes:
         domain_experts.setdefault(node["expert_id"], []).append(node)
@@ -282,10 +288,10 @@ def _stage1_domain_route(
         score = 0.0
         for node in expert_nodes:
             for term in node["triggers"]:
-                if _normalize(term["term"]) in " ".join(intent_tokens):
+                if _normalize(term["term"]) in normalized_query:
                     score += term["weight"]
             for anti in node["anti_triggers"]:
-                if _normalize(anti) in " ".join(intent_tokens):
+                if _normalize(anti) in normalized_query:
                     score -= 100
         domain_scores[expert_id] = score
 
@@ -293,24 +299,22 @@ def _stage1_domain_route(
     for domain in sorted(domain_scores):
         if domain_scores[domain] > 0:
             selected.append(domain)
-    if explicit_risk_domains:
-        for domain in sorted(domain_experts):
-            node_kinds = {n["node_kind"] for n in domain_experts[domain]}
-            if "red_line" in node_kinds and domain not in selected:
-                selected.append(domain)
     return domain_scores, sorted(selected)
 
 
 def _stage2_atomic_route(
     nodes: list[dict[str, Any]],
     selected_domains: list[str],
-    intent_tokens: list[str],
+    normalized_query: str,
     minimum_score: int = 2,
     top_k: int = 5,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
-    """Stage 2: fine-grained atomic node selection within selected domains."""
+    """Stage 2: fine-grained atomic node selection within selected domains.
+
+    Phrase matching uses the ordered normalized query, not rejoined sorted tokens.
+    """
     candidates = [n for n in nodes if n["expert_id"] in selected_domains]
-    query_text = " ".join(intent_tokens)
+    query_text = normalized_query
 
     node_scores: list[dict[str, Any]] = []
     for node in candidates:
@@ -654,13 +658,16 @@ def route_graph(
     max_closure = bounded_int("max_closure_nodes", policy["max_closure_nodes"], 1, policy["max_closure_nodes"])
     vector_top_k = bounded_int("vector_top_k", policy["vector_top_k"], 1, policy["max_top_k"])
     revisit_top_k = policy["revisit_top_k"]
+    # One ordered normalized query is the only phrase-matching text; intent
+    # tokens stay deterministically unique/sorted for token-level scoring only.
+    normalized_query = _normalize(query)
     intent_tokens = _extract_intent_tokens(query)
 
     audit_log: list[dict[str, Any]] = []
     seq = 0
 
     # --- Stage 1: Lexical domain routing ---
-    domain_scores, selected_domains = _stage1_domain_route(nodes, intent_tokens, risk_domains)
+    domain_scores, selected_domains = _stage1_domain_route(nodes, normalized_query)
     seq += 1
     audit_log.append({"sequence": seq, "event": "stage1_domain_route", "details": {
         "domain_scores": domain_scores,
@@ -669,7 +676,7 @@ def route_graph(
 
     # --- Stage 2: Lexical atomic selection ---
     node_scores, selected_entries, below_threshold = _stage2_atomic_route(
-        nodes, selected_domains, intent_tokens, minimum_score, top_k
+        nodes, selected_domains, normalized_query, minimum_score, top_k
     )
     lexical_ids = {e["node_id"] for e in selected_entries}
     seq += 1
@@ -723,11 +730,12 @@ def route_graph(
             vector_stage["vector_candidates"] = vec_result["vector_candidates"]
             vector_stage["vector_exclusions"] = vec_result["vector_exclusions"]
 
-            # Symbolic reranking
+            # Symbolic reranking; anti-trigger phrases match the ordered
+            # normalized query, never rejoined sorted tokens.
             anti_trigger_set = set()
             for node in nodes:
                 for a in node.get("anti_triggers", []):
-                    if _normalize(a) in " ".join(intent_tokens):
+                    if _normalize(a) in normalized_query:
                         anti_trigger_set.add(a.lower())
 
             rerank_result = symbolic_rerank(
@@ -941,7 +949,7 @@ def route_graph(
         "query_id": query_id,
         "status": status,
         "query_context": {
-            "normalized_query": _normalize(query),
+            "normalized_query": normalized_query,
             "intent_tokens": intent_tokens,
             "explicit_risk_domains": risk_domains,
             "stage_id": "graph_route",

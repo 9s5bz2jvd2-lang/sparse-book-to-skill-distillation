@@ -529,17 +529,10 @@ def main() -> int:
         # ==================================================================
         # J. Anti-trigger exclusion
         # ==================================================================
-        # Anti-trigger matching uses normalized substring in sorted-joined tokens.
-        # "just answer one fact" as anti_trigger of coverage-definition node.
-        # We need the normalized anti_trigger to be a substring of the sorted
-        # query tokens. Use query words that sort so the phrase appears intact.
-        # sorted tokens of "answer coverage fact just one" includes "answer coverage fact just one"
-        # but "just answer one fact" normalizes to "just answer one fact".
-        # The sorted join is "answer coverage fact just one" - does NOT contain "just answer one fact".
-        # So we use the safety node's anti-trigger "ignore safety" with a query
-        # where "ignore" and "safety" are adjacent in sorted order.
-        # "coverage ignore safety workflow" -> sorted: "coverage ignore safety workflow"
-        # "ignore safety" IS a substring!
+        # Anti-trigger phrases match the ordered normalized query. The query
+        # below contains the safety node's anti-trigger "ignore safety" in
+        # original word order, so the node must be excluded from lexical
+        # selection.
         anti_request = {
             "query_id": "test-anti",
             "query": "coverage ignore safety workflow",
@@ -631,6 +624,104 @@ def main() -> int:
         assert json.loads(collision_cli.stderr)["error"] == "output_path_collision"
         assert file_sha256(graph_path) == graph_sha_before_collision
         results.append(("graph-cli-input-protection", "route output cannot overwrite graph/request/vector/residual inputs"))
+
+        # ==================================================================
+        # N. NFKC/ordered normalized-query phrase matching
+        # ==================================================================
+        # NFKC folds full-width/compatibility forms; casefold and whitespace
+        # collapse produce one ordered normalized_query used for phrase hits.
+        nfkc_route = route_graph(graph_path, {
+            "query_id": "nfkc-fullwidth",
+            "query": "ＣＯＶＥＲＡＧＥ　ＬＥＤＧＥＲ　ｉｎｖｅｎｔｏｒｙ",
+            "risk_domains": [],
+        })
+        assert nfkc_route["query_context"]["normalized_query"] == "coverage ledger inventory"
+        nfkc_scores = {ns["node_id"]: ns for ns in nfkc_route["stage2_atomic_route"]["node_scores"]}
+        assert "coverage ledger" in nfkc_scores["coverage-definition"]["hits"]
+        assert "coverage-definition" in nfkc_route["stage2_atomic_route"]["lexical_selected_ids"]
+        results.append(("normalize-nfkc", "full-width NFKC forms normalize and hit the ordered trigger phrase"))
+
+        fold_route = route_graph(graph_path, {
+            "query_id": "casefold-whitespace",
+            "query": "  COVERAGE\t\n  Ledger  ",
+            "risk_domains": [],
+        })
+        assert fold_route["query_context"]["normalized_query"] == "coverage ledger"
+        results.append(("normalize-casefold-ws", "casefold plus whitespace collapse yields the ordered normalized_query"))
+
+        ordered_route = route_graph(graph_path, {
+            "query_id": "ordered-phrase",
+            "query": "Build a complete source coverage ledger for this manifest",
+            "risk_domains": [],
+        })
+        assert ordered_route["query_context"]["normalized_query"] == "build a complete source coverage ledger for this manifest"
+        ordered_scores = {ns["node_id"]: ns for ns in ordered_route["stage2_atomic_route"]["node_scores"]}
+        ordered_hits = ordered_scores["coverage-definition"]["hits"]
+        assert "coverage ledger" in ordered_hits and "complete source" in ordered_hits
+        results.append(("ordered-phrase-hit", "ordered multi-word trigger phrases hit on the normalized query"))
+
+        reversed_route = route_graph(graph_path, {
+            "query_id": "reversed-phrase",
+            "query": "ledger coverage inventory",
+            "risk_domains": [],
+        })
+        reversed_scores = {ns["node_id"]: ns for ns in reversed_route["stage2_atomic_route"]["node_scores"]}
+        reversed_hits = reversed_scores["coverage-definition"]["hits"]
+        assert "coverage ledger" not in reversed_hits
+        assert {"coverage", "ledger", "inventory"} <= set(reversed_hits)
+        results.append(("reversed-phrase-no-hit", "reversed words do not impersonate a trigger phrase; single tokens still score"))
+
+        anti_ordered = route_graph(graph_path, {
+            "query_id": "anti-ordered",
+            "query": "just answer one fact from the coverage ledger",
+            "risk_domains": [],
+        })
+        assert anti_ordered["stage1_domain_route"]["domain_scores"]["coverage-ledger"] < 0
+        assert "coverage-ledger" not in anti_ordered["stage1_domain_route"]["selected_domains"]
+        assert "coverage-definition" not in anti_ordered["stage2_atomic_route"]["lexical_selected_ids"]
+        results.append(("anti-ordered-suppresses", "ordered multi-word anti-trigger suppresses domain and lexical selection"))
+
+        anti_reversed = route_graph(graph_path, {
+            "query_id": "anti-reversed",
+            "query": "fact one answer just coverage ledger",
+            "risk_domains": [],
+        })
+        anti_rev_scores = {ns["node_id"]: ns for ns in anti_reversed["stage2_atomic_route"]["node_scores"]}
+        assert anti_rev_scores["coverage-definition"]["anti_hits"] == []
+        assert "coverage-definition" in anti_reversed["stage2_atomic_route"]["lexical_selected_ids"]
+        safety_reversed = route_graph(graph_path, {
+            "query_id": "anti-reversed-safety",
+            "query": "safety ignore pending chunk",
+            "risk_domains": [],
+        })
+        safety_rev_scores = {ns["node_id"]: ns for ns in safety_reversed["stage2_atomic_route"]["node_scores"]}
+        assert safety_rev_scores["safety-no-partial-coverage"]["anti_hits"] == []
+        assert "safety-no-partial-coverage" in safety_reversed["stage2_atomic_route"]["lexical_selected_ids"]
+        results.append(("anti-reversed-no-impersonation", "reversed anti-trigger words do not impersonate the phrase"))
+
+        # ==================================================================
+        # O. Risk-domain scope: no broad expert wakeup, scoped safety intact
+        # ==================================================================
+        risk_request = {
+            "query_id": "risk-scoped",
+            "query": "distill semantic condition applicability",
+            "risk_domains": ["coverage_integrity"],
+        }
+        risk_route = route_graph(graph_path, risk_request)
+        assert risk_route["stage1_domain_route"]["selected_domains"] == ["semantic-distillation"]
+        assert "safety-governance" not in risk_route["stage1_domain_route"]["selected_domains"]
+        assert "safety-no-partial-coverage" in risk_route["closure"]["expanded_node_ids"]
+        assert "safety-no-partial-coverage" in risk_route["safety"]["risk_domain_included"]
+        risk_selected = {sn["node_id"]: sn for sn in risk_route["selected_nodes"]}
+        assert "safety" in risk_selected["safety-no-partial-coverage"]["origins"]
+        assert len(risk_route["closure"]["expanded_node_ids"]) <= risk_route["closure"]["budget"]
+        results.append(("risk-domain-scoped", "risk domain no longer wakes red-line experts; scoped safety still enters the bounded closure"))
+
+        risk_repeat = route_graph(graph_path, risk_request)
+        risk_a = {k: v for k, v in risk_route.items() if k != "residual"}
+        risk_b = {k: v for k, v in risk_repeat.items() if k != "residual"}
+        assert json.dumps(risk_a, sort_keys=True) == json.dumps(risk_b, sort_keys=True)
+        results.append(("risk-domain-deterministic", "repeated risk-domain request produces identical output"))
 
         # ==================================================================
         # Deferred: Composition tests (preserved, not counted)

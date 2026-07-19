@@ -150,7 +150,7 @@ def main() -> int:
     if readiness_exit:
         print("FAIL real-material readiness regression suite", file=sys.stderr)
         return 1
-    print(f"PASS repository validation: contract={CONTRACT_VERSION} schemas={len(schemas)} curated_records={len(curated_records)} lifecycle_cases={len(fixtures['cases'])} readiness_cases=3")
+    print(f"PASS repository validation: contract={CONTRACT_VERSION} schemas={len(schemas)} curated_records={len(curated_records)} lifecycle_cases={len(fixtures['cases'])} readiness_cases=4")
     print("PASS source intake, ordered resume, semantic-review gate, artifact-derived build, trial metrics, sparse load plan, and mandatory sweep")
     return 0
 

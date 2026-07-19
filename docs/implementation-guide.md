@@ -66,12 +66,12 @@ For every item in `work-queue.json`, an agent or human must:
 For long material, use durable contiguous batches:
 
 ```bash
-python3 scripts/review_queue.py next --workspace build/my-book --batch-size 20
+python3 scripts/review_queue.py next --workspace build/my-book --batch-size 3
 # read and author every returned item; interruption-safe `next` returns the same batch
 python3 scripts/review_queue.py checkpoint --workspace build/my-book
 ```
 
-Only checkpoint can advance. Pending, out-of-order, tampered, or falsely complete progress is rejected. See `reference/full-distillation-workflow.md`, `reference/real-material-trial.md`, and the templates in `assets/`. Chunking or lexical extraction must never be described as semantic distillation.
+The default batch size is 3; it may change only between batches, never on an active slice. Only checkpoint can advance: it commits the longest valid contiguous authored prefix of the active slice (a pending head commits nothing; an invalid non-pending prefix record hard-fails with state unchanged). Prefix validation is structural/identity/provenance only, not semantic truth. Out-of-order, tampered, or falsely complete progress is rejected. See `reference/full-distillation-workflow.md`, `reference/real-material-trial.md`, and the templates in `assets/`. Chunking or lexical extraction must never be described as semantic distillation.
 
 After authoring:
 
@@ -203,7 +203,7 @@ The graph suite adds authored-atom installation, exact v2→atom coverage bindin
 
 The executable lifecycle suite covers successful full lifecycle; recomputed original/text/chunk hashes and queue coverage; pending and missing chunks; bad artifact/imported-source hashes; bad line and source provenance; missing L3; build-before-validation refusal; artifact-derived registry/index; registry/build/index and shared-core/L3/chunk checksum binding; positive exact L3/chunk load plans; threshold, top-k, stable ties, global/per-expert anti-triggers; baseline sweeps for selected/below-threshold/bypassed/rejected routes; high-risk/ambiguous safety activation; malformed input; version mismatch; and default demo cleanup.
 
-The readiness suite adds 300 generated chunks, interrupted-batch replay, checkpoint refusal, out-of-order refusal, all-chunk semantic-review gating, and the external query-gold/report harness. It proves only these structural behaviors. It does not turn the generated source or pre-authored demo into evidence of real-book semantics.
+The readiness suite adds 300 generated chunks, interrupted-batch replay, longest-valid-prefix checkpointing with empty-prefix refusal and injected-fault recovery, out-of-order refusal, all-chunk semantic-review gating, and the external query-gold/report harness. It proves only these structural behaviors. It does not turn the generated source or pre-authored demo into evidence of real-book semantics.
 
 `scripts/check_concept_continuity.py` is a phrase/binding conceptual-continuity regression gate: it fails repository validation if the network→ring→sphere design core, connected low-power anchors, implemented-versus-protocol-only status boundary, or named executable bindings are removed. It does not prove semantic non-contradiction; reviewers still own that judgment.
 
